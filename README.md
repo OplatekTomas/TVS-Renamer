@@ -10,7 +10,7 @@ Example:
 Futurama - S01E01 - Space Pilot 3000
 
 
-Changelog:
+**Changelog:**
 
 Current version: 0.3 (+- 19th September 2016)
 
