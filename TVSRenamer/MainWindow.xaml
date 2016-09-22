@@ -1,0 +1,36 @@
+﻿<Window x:Class="TVSRenamer.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TVSRenamer"
+        mc:Ignorable="d"
+        Title="TVS Renamer" Height="183" Width="725" Background="#FFB4B4B4"
+        ResizeMode="NoResize">
+    <Grid Loaded="Grid_Loaded">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="545*"/>
+            <ColumnDefinition Width="172*"/>
+        </Grid.ColumnDefinitions>
+        <Button x:Name="Start" Content="Rename" HorizontalAlignment="Left" Margin="76,115,0,0" VerticalAlignment="Top" Width="75" Height="23" IsEnabled="False" Click="Start_Click" Grid.Column="1"/>
+        <Button x:Name="settingsBtn" Content="Settings" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Click="button_Click" Margin="22,0,0,0" Grid.Column="1"/>
+        <TextBlock x:Name="textBlock" HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="256" Height="23"><Run Text="Enter location of TV Show you want to rename"/><Run Text=":"/><LineBreak/><Run/></TextBlock>
+        <TextBox x:Name="TVLoc" HorizontalAlignment="Left" Height="23" Margin="10,33,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="256" TextChanged="TVLoc_TextChanged"/>
+        <TextBlock x:Name="textBlock1" HorizontalAlignment="Left" Margin="10,61,0,0" TextWrapping="Wrap" Text="Name of that TV Show:" VerticalAlignment="Top" Width="256" Height="23"/>
+        <TextBox x:Name="Name" HorizontalAlignment="Left" Height="23" Margin="10,84,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="256" TextChanged="Name_TextChanged"/>
+        <Button x:Name="Folder" Content="Open" HorizontalAlignment="Left" Margin="304,33,0,0" VerticalAlignment="Top" Width="75" Height="23" Click="button_Click_1"/>
+        <Button x:Name="button1" Content="Check" HorizontalAlignment="Left" Margin="304,84,0,0" VerticalAlignment="Top" Width="75" IsEnabled="False" Height="23" Click="button1_Click"/>
+        <Button x:Name="InfoBtn" Content="Info" HorizontalAlignment="Left" Margin="97,0,0,0" VerticalAlignment="Top" Width="75" Click="InfoBtn_Click" Grid.Column="1"/>
+        <TextBlock x:Name="textBlock2" HorizontalAlignment="Left" Margin="404,33,0,0" TextWrapping="Wrap" Text="TV Show name:" VerticalAlignment="Top" Width="111"/>
+        <TextBlock x:Name="textBlock4" HorizontalAlignment="Left" Margin="404,61,0,0" TextWrapping="Wrap" Text="Found seasons:" VerticalAlignment="Top" Width="111"/>
+        <TextBlock x:Name="textShowName" HorizontalAlignment="Left" Margin="520,33,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="187" Grid.ColumnSpan="2"/>
+        <TextBlock x:Name="textOwnedSeasons" HorizontalAlignment="Left" Margin="520,61,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="187" Grid.ColumnSpan="2"/>
+        <CheckBox x:Name="checkBox" Content="Search using IMDb ID" HorizontalAlignment="Left" Margin="304,118,0,0" VerticalAlignment="Top" Height="17" Width="152" Checked="checkBox_Checked"/>
+        <ComboBox x:Name="comboBox" HorizontalAlignment="Left" Margin="114,112,0,0" VerticalAlignment="Top" Loaded="ComboBox_Loaded" Width="152" Height="23" SelectionChanged="comboBox_SelectionChanged_1"/>
+        <TextBlock x:Name="textBlock3" HorizontalAlignment="Left" Margin="10,115,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="21" Text="I'm working with:"/>
+        <Button x:Name="specific" Content="Rename Specific EP" HorizontalAlignment="Left" Margin="493,115,0,0" VerticalAlignment="Top" Width="115" Height="23" Click="specific_Click" IsEnabled="True" Grid.ColumnSpan="2"/>
+
+
+
+    </Grid>
+</Window>
