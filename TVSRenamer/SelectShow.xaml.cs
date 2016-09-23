@@ -27,7 +27,7 @@ namespace TVSRenamer {
         string final;
         string info = null;
         string[] showInfo = new string[15];
-        private void next(string value,string airDate,string infoShow) {
+        private void next(string value,string airDate,string infoShow,string id) {
             Grid polozka = new Grid();
             polozka.Height = 32;
             Seznam.Children.Add(polozka);
@@ -40,7 +40,7 @@ namespace TVSRenamer {
             //Selected button - basicly done.
             confirm.Margin = new Thickness(376, 10, 10, 2);
             confirm.Width = 75;
-            confirm.Click += (s, e) => { selected(value); };
+            confirm.Click += (s, e) => { selected(id); };
             confirm.Content = "Select";
             polozka.Children.Add(confirm);
             //Info button - Function missing so far
@@ -83,11 +83,8 @@ namespace TVSRenamer {
             this.Close();
             final = name;
         }
-        public string Return
-        {
-
+        public string Return{
             get { return final; }
-
         }
         private void infoWin(string infoShow) {
             var w = new MoreInfo(infoShow);
@@ -97,6 +94,7 @@ namespace TVSRenamer {
             JObject parse = JObject.Parse(info);
             JObject parse2 = JObject.Parse(info);
             JObject parse3 = JObject.Parse(info);
+            JObject parse4 = JObject.Parse(info);
             int height=0;
             
             for (int i = 0; i < 16; i++) {
@@ -104,9 +102,10 @@ namespace TVSRenamer {
                     var specificInfo = parse["data"][i];
                     var showName = parse2["data"][i]["seriesName"];
                     var airDate = parse3["data"][i]["firstAired"];
+                    var ID = parse4["data"][i]["id"];
                     height++;
                     string date =airDate.ToString().Replace('-', '.');
-                    next(showName.ToString(), date, specificInfo.ToString());
+                    next(showName.ToString(), date, specificInfo.ToString(),ID.ToString());
                 } catch (ArgumentOutOfRangeException) {
 
                 }

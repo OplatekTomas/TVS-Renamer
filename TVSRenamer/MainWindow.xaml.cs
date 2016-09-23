@@ -81,13 +81,13 @@ namespace TVSRenamer {
             }
 
         }
+        
        
         private string checkNameExists() {
             string showNameNoSpaces = showName.Replace(" ", "+");
             string getName = DownloadFromApi.apiGet("https://api.thetvdb.com/search/series?name=" + showNameNoSpaces, token,0);
             info = getName;
-            if (info == "error") {
-                textShowName.Foreground = Brushes.Tomato;
+            if (info == "Error") {
                 return "Error!";
             }
             var w = new SelectShow(info);
@@ -95,17 +95,15 @@ namespace TVSRenamer {
             return w.Return;
         }
         private string checkNameExistsIMDb() {
-            string getName = DownloadFromApi.apiGet("https://api.thetvdb.com/search/series?imdbId=" + showName, token,0);
-            info = getName;
-            if (info == "error") {
-                textShowName.Foreground = Brushes.Tomato;
-                return "Error!";
-
-            }
+            string getName = DownloadFromApi.apiGet("https://api.thetvdb.com/search/series?imdbId=" + showName, token, 0);
             string name;
-            Regex regex = new Regex("seriesName\": \"([a-zA-Z0-9,._' ]{1,100})\",");
-            Match match = regex.Match(getName);
-            name = match.Groups[1].Value;
+            if (info == "error") {
+                return "Error!";
+            }
+            JObject parsed = JObject.Parse(getName);
+            TVID = parsed["data"][0]["id"].ToString();
+            info = DownloadFromApi.apiGet("https://api.thetvdb.com/series" + TVID, token, 0);
+            name = parsed["data"][0]["seriesName"].ToString();
             return name;
         }
 
@@ -164,17 +162,21 @@ namespace TVSRenamer {
             textShowName.Foreground = Brushes.Black;
             if (checkBox.IsChecked == true) {
                 textShowName.Text = checkNameExistsIMDb();
-            } else { textShowName.Text = checkNameExists(); }
-            if (textShowName.Text != null || textShowName.Text != "") {
-
-                string almostTVID = info;
-                Regex regex = new Regex("\"id\": ([0-9]{1,10}),");
-                Match match = regex.Match(almostTVID);
-                TVID = match.Groups[1].Value;
+            } else { textShowName.Text = getFromID(); }
+            if (textShowName.Text != "Error!") {
                 Start.IsEnabled = true;
-                textOwnedSeasons.Text = ownedSeasons();
+                showName = textShowName.Text;
+                ownedSeasons();
             } else { textShowName.Foreground = Brushes.Tomato; textShowName.Text = "TV show was not found!"; }
-            showName = textShowName.Text;
+            
+        }
+        private string getFromID() {
+            TVID=checkNameExists();
+            if (TVID != "Error!") {
+                info = DownloadFromApi.apiGet("https://api.thetvdb.com/series/" + TVID, token, 0);
+                JObject tvShowName = JObject.Parse(info);
+                return tvShowName["data"]["seriesName"].ToString();
+            } else { return "Error!"; }
         }
         private void Name_TextChanged(object sender, TextChangedEventArgs e) {
             showName = Name.Text;
@@ -296,7 +298,7 @@ namespace TVSRenamer {
             string getName = info;
             JObject test = JObject.Parse(getName);
             try {
-                var alias = test["data"][0]["aliases"][number];
+                var alias = test["data"]["aliases"][number];
                 return alias.ToString();
             } catch (ArgumentOutOfRangeException) {
                 return null;
@@ -307,7 +309,7 @@ namespace TVSRenamer {
         private int getNumberAliases() {
             string getName = info;
             JObject test = JObject.Parse(getName);
-            return test["data"][0]["aliases"].Count();
+            return test["data"]["aliases"].Count();
         }
 
         private void rename() {
