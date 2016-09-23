@@ -1,4 +1,7 @@
 # TVS-Renamer
+
+##DO NOT USE THIS RIGHT NOW! FOUND HUGE BUG! FIXING RIGHT NOW!##
+
 C# Written app that renames TV Show episodes. At least slight change is released daily.
 
 episodes get renamed to format:
