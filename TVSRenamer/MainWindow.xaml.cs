@@ -81,7 +81,7 @@ namespace TVSRenamer {
             }
 
         }
-        
+
        
         private string checkNameExists() {
             string showNameNoSpaces = showName.Replace(" ", "+");
@@ -441,7 +441,7 @@ namespace TVSRenamer {
         }
 
         private void specific_Click(object sender, RoutedEventArgs e) {
-            var window = new specificEP("Kappa") { Owner = this };
+            var window = new specificEP(token) { Owner = this };
             window.ShowDialog();
             
         }

@@ -10,15 +10,15 @@
     <Grid>
         <TextBlock x:Name="textBlock" HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="Path to file:" VerticalAlignment="Top" Width="66"/>
         <TextBox x:Name="textBox" HorizontalAlignment="Left" Height="23" Margin="10,31,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="215" TextChanged="textBox_TextChanged"/>
-        <Button x:Name="button" Content="Open file" HorizontalAlignment="Left" Margin="256,31,0,0" VerticalAlignment="Top" Width="75" Height="23"/>
+        <Button x:Name="selectFile" Content="Open file" HorizontalAlignment="Left" Margin="256,31,0,0" VerticalAlignment="Top" Width="75" Height="23" Click="selectFile_Click"/>
         <TextBlock x:Name="textBlock1" HorizontalAlignment="Left" Margin="10,59,0,0" TextWrapping="Wrap" Text="Show Name:" VerticalAlignment="Top" Width="83"/>
         <TextBlock x:Name="textBlock2" HorizontalAlignment="Left" Margin="10,108,0,0" TextWrapping="Wrap" Text="Season:" VerticalAlignment="Top"/>
         <TextBox x:Name="textBox2" HorizontalAlignment="Left" Height="23" Margin="10,129,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="49" TextChanged="textBox2_TextChanged"/>
         <TextBlock x:Name="textBlock3" HorizontalAlignment="Left" Margin="81,111,0,0" TextWrapping="Wrap" Text="Episode:" VerticalAlignment="Top"/>
-        <TextBox x:Name="textBox3" HorizontalAlignment="Left" Height="23" Margin="81,129,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="49"/>
+        <TextBox x:Name="textBox3" HorizontalAlignment="Left" Height="23" Margin="81,129,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="49" TextChanged="textBox3_TextChanged"/>
         <TextBox x:Name="textBox_Copy" HorizontalAlignment="Left" Height="23" Margin="10,80,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" TextChanged="textBox_TextChanged"/>
-        <Button x:Name="button1" Content="Select" HorizontalAlignment="Left" Margin="150,80,0,0" VerticalAlignment="Top" Width="75" Height="23"/>
-        <Button x:Name="button2" Content="Rename" HorizontalAlignment="Left" Margin="256,129,0,0" VerticalAlignment="Top" Width="75" Height="23" IsEnabled="False"/>
+        <Button x:Name="findShow" Content="Select" HorizontalAlignment="Left" Margin="150,80,0,0" VerticalAlignment="Top" Width="75" Height="23" Click="findShow_Click"/>
+        <Button x:Name="button2" Content="Rename" HorizontalAlignment="Left" Margin="256,129,0,0" VerticalAlignment="Top" Width="75" Height="23" IsEnabled="False" Click="button2_Click"/>
 
     </Grid>
 </Window>
