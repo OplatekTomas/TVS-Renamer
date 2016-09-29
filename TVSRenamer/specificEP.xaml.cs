@@ -1,4 +1,5 @@
 ﻿using Microsoft.Win32;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -78,8 +79,29 @@ namespace TVSRenamer {
         }
        
     private void button2_Click(object sender, RoutedEventArgs e) {
-            int season=Int32.Parse(textBox2.Text);
-            int episode= Int32.Parse(textBox3.Text);
+            int season = Int32.Parse(textBox2.Text);
+            int episode = Int32.Parse(textBox3.Text);
+            string name = DownloadFromApi.apiGet("https://api.thetvdb.com/series/" + ID + "/episodes/query?airedSeason=" + season + "&airedEpisode=" + episode,tkn,0);
+            string showName = DownloadFromApi.apiGet("https://api.thetvdb.com/series/" + ID,tkn,0);
+            JObject parsed = JObject.Parse(name);
+            JObject parsedSN = JObject.Parse(info);
+            name = parsed["data"][0]["episodeName"].ToString();
+            showName = parsedSN["data"][0]["seriesName"].ToString();
+            string invalid = new string(System.IO.Path.GetInvalidFileNameChars()) + new string(System.IO.Path.GetInvalidPathChars());
+            foreach (char znak in invalid) {
+                name = name.Replace(znak.ToString(), "");
+            }
+            if (season < 10) {
+                if (episode < 10) { name = showName + " - S0" + season + "E0" + episode + " - " + name; }
+                if (episode >= 10) { name = showName + " - S0" + season + "E" + episode + " - " + name; }
+            } else if (season < 10) {
+                if (episode < 10) { name = showName + " - S" + season + "E0" + episode + " - " + name; }
+                if (episode >= 10) { name = showName + " - S" + season + "E" + episode + " - " + name; ; }
+            }
+            try {
+                File.Move(path, Path.GetDirectoryName(path) + name + Path.GetExtension(path));
+                MessageBox.Show("File was removed!");
+            } catch (IOException) { MessageBox.Show("Something went wrong\nAre you sure file " + path + " isn't being used?"); }
         }
     }
 }
