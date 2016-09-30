@@ -22,7 +22,7 @@ namespace TVSRenamer {
         }
 
         private void button_Click(object sender, RoutedEventArgs e) {
-            MessageBox.Show("0.3 Added \"Select show\" feature, ability to search in downloads folder instead of just a database, slight UI change, bug fixes.\nv0.2.1 Huge bug fix, improved file searching algorithm, small code changes\nv0.2 API change, added function to search for files, ability to search using IMDb ID, MUCH MUCH better code, +- metric ton of bug fixes\n v0.1 Initial release!", "Changelog");
+            MessageBox.Show("v0.4 You can now rename specific files/episodes instead of whole folders, bug fixes (huge ones). Last major beta release. Bugfixes may come but nothing huge is on the way.\nv0.3 Added \"Select show\" feature, ability to search in downloads folder instead of just a database, slight UI change, bug fixes.\nv0.2.1 Huge bug fix, improved file searching algorithm, small code changes\nv0.2 API change, added function to search for files, ability to search using IMDb ID, MUCH MUCH better code, +- metric ton of bug fixes\n v0.1 Initial release!", "Changelog");
         }
 
         private void button1_Click(object sender, RoutedEventArgs e) {

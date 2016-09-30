@@ -100,7 +100,7 @@ namespace TVSRenamer {
             }
             try {
                 File.Move(path, Path.GetDirectoryName(path) + name + Path.GetExtension(path));
-                MessageBox.Show("File was removed!");
+                MessageBox.Show("File was renamed!");
             } catch (IOException) { MessageBox.Show("Something went wrong\nAre you sure file " + path + " isn't being used?"); }
         }
     }
