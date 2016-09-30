@@ -13,7 +13,7 @@ Futurama - S01E01 - Space Pilot 3000
 
 
 ##Changelog:##
-###Current version: 0. (30th September 2016)###
+###Current version: 0.4 (30th September 2016)###
 
 -Added option to rename specific files
 
