@@ -27,12 +27,15 @@ namespace TVSRenamer {
         string TVID;
         int subFolders;
         const int namesCount = 50;
-        string[,,] names = new string[namesCount, namesCount, 200];
+        string[,,] names = new string[namesCount, namesCount, 3];
         string token = Properties.Settings.Default["Token"].ToString();
         string[] fileExtension = new string[10] { ".mkv", ".srt", ".m4v", ".avi", ".mp4", ".mov", ".sub", ".wmv", ".flv", ".idx" };
         string info;
         string defLoc;
+        List<string> isShowFile = new List<string>();
         FolderBrowserDialog fbd = new FolderBrowserDialog();
+
+
         private void generateSearch() {
             for (int season = 1; season <= namesCount; season++) {
                 for (int episode = 1; episode <= namesCount; episode++) {
@@ -48,41 +51,11 @@ namespace TVSRenamer {
             }
         }
         private void runGen(string seasonNumb, string episodeNumb, int season, int episode) {
-            string showNameNoSpaces;
-            showNameNoSpaces = showName.Replace(" ", ".");
             names[season - 1, episode - 1, 0] = "S" + seasonNumb + season + "E" + episodeNumb + episode;
             names[season - 1, episode - 1, 1] = "S" + seasonNumb + season + ".E" + episodeNumb + episode;
             names[season - 1, episode - 1, 2] = "S" + seasonNumb + season + " E" + episodeNumb + episode;
             names[season - 1, episode - 1, 3] = seasonNumb + season + "x" + episodeNumb + episode;
-            names[season - 1, episode - 1, 4] = showName + " S" + seasonNumb + season + "E" + episodeNumb + episode;
-            names[season - 1, episode - 1, 5] = showName + " S" + seasonNumb + season + ".E" + episodeNumb + episode;
-            names[season - 1, episode - 1, 6] = showName + " - S" + seasonNumb + season + "E" + episodeNumb + episode;
-            names[season - 1, episode - 1, 7] = showName + " - S" + seasonNumb + season + ".E" + episodeNumb + episode;
-            names[season - 1, episode - 1, 8] = showName + " - S" + seasonNumb + season + " E" + episodeNumb + episode;
-            names[season - 1, episode - 1, 9] = showName + " S" + seasonNumb + season + " E" + episodeNumb + episode;
-            names[season - 1, episode - 1, 10] = showName + " " + seasonNumb + season + "x" + episodeNumb + episode;
-            names[season - 1, episode - 1, 11] = showName + " - " + seasonNumb + season + "x" + episodeNumb + episode;
-            names[season - 1, episode - 1, 12] = showNameNoSpaces + ".S" + seasonNumb + +season + "E" + episodeNumb + episode;
-            names[season - 1, episode - 1, 13] = showNameNoSpaces + ".S" + seasonNumb + +season + ".E" + episodeNumb + episode;
-            names[season - 1, episode - 1, 14] = showNameNoSpaces + "." + seasonNumb + season + "x" + episodeNumb + episode;
-            for (int namesCount = 0; namesCount < getNumberAliases(); namesCount++) {
-                names[season - 1, episode - 1, 5 + namesCount + (11 * (namesCount + 1))] = getAliases(namesCount) + " S" + seasonNumb + season + "E" + episodeNumb + episode;
-                names[season - 1, episode - 1, 6 + namesCount + (11 * (namesCount + 1))] = getAliases(namesCount) + " S" + seasonNumb + season + ".E" + episodeNumb + episode;
-                names[season - 1, episode - 1, 7 + namesCount + (11 * (namesCount + 1))] = getAliases(namesCount).Replace(" ", ".") + ".S" + seasonNumb + season + "E" + episodeNumb + episode;
-                names[season - 1, episode - 1, 8 + namesCount + (11 * (namesCount + 1))] = getAliases(namesCount).Replace(" ", ".") + ".S" + seasonNumb + season + ".E" + episodeNumb + episode;
-                names[season - 1, episode - 1, 9 + namesCount + (11 * (namesCount + 1))] = getAliases(namesCount) + " " + seasonNumb + season + "x" + episodeNumb + episode;
-                names[season - 1, episode - 1, 10 + namesCount + (11 * (namesCount + 1))] = getAliases(namesCount).Replace(" ", ".") + "." + seasonNumb + season + "x" + episodeNumb + episode;
-                names[season - 1, episode - 1, 11 + namesCount + (11 * (namesCount + 1))] = getAliases(namesCount) + " S" + seasonNumb + season + " E" + episodeNumb + episode;
-                names[season - 1, episode - 1, 12 + namesCount + (11 * (namesCount + 1))] = getAliases(namesCount) + " - S" + seasonNumb + season + "E" + episodeNumb + episode;
-                names[season - 1, episode - 1, 13 + namesCount + (11 * (namesCount + 1))] = getAliases(namesCount) + " - S" + seasonNumb + season + " E" + episodeNumb + episode;
-                names[season - 1, episode - 1, 14 + namesCount + (11 * (namesCount + 1))] = getAliases(namesCount) + " - S" + seasonNumb + season + ".E" + episodeNumb + episode;
-                names[season - 1, episode - 1, 15 + namesCount + (11 * (namesCount + 1))] = getAliases(namesCount) + " - " + seasonNumb + season + "x" + episodeNumb + episode;
-
-            }
-
         }
-
-       
         private string checkNameExists() {
             string showNameNoSpaces = showName.Replace(" ", "+");
             string getName = DownloadFromApi.apiGet("https://api.thetvdb.com/search/series?name=" + showNameNoSpaces, token,0);
@@ -196,7 +169,7 @@ namespace TVSRenamer {
             int f1L = 0;
             int f2L = 0;
             int f3L = 0;
-            bool time = false;
+            bool shitton = false;
             try {
                 f1L = System.IO.Directory.GetFiles(settings1, "*.*", System.IO.SearchOption.AllDirectories).Length;
             } catch (ArgumentException) { }
@@ -206,10 +179,10 @@ namespace TVSRenamer {
             try {
                 f3L = System.IO.Directory.GetFiles(settings3, "*.*", System.IO.SearchOption.AllDirectories).Length;
             } catch (ArgumentException) { }
-            if (f1L > 10000) { time = true; MessageBox.Show("Number of files in folder " + settings1 + " are higher then max limit (10 000)"); }
-            if (f2L > 10000) { time = true; MessageBox.Show("Number of files in folder " + settings2 + " are higher then max limit (10 000)"); }
-            if (f3L > 10000) { time = true; MessageBox.Show("Number of files in folder " + settings3 + " are higher then max limit (10 000)"); }
-            if (time == false) {
+            if (f1L > 10000) { shitton = true; MessageBox.Show("Number of files in folder " + settings1 + " is higher then max limit (10 000)"); }
+            if (f2L > 10000) { shitton = true; MessageBox.Show("Number of files in folder " + settings2 + " is higher then max limit (10 000)"); }
+            if (f3L > 10000) { shitton = true; MessageBox.Show("Number of files in folder " + settings3 + " is higher then max limit (10 000)"); }
+            if (shitton == false) {
                 string[] folder1 = new string[f1L];
                 string[] folder2 = new string[f2L];
                 string[] folder3 = new string[f3L];
@@ -223,14 +196,14 @@ namespace TVSRenamer {
                     folder3 = System.IO.Directory.GetFiles(settings3, "*.*", System.IO.SearchOption.AllDirectories);
                 } catch (ArgumentException) { }
                 for (int files = 0; files < 3; files++) {
-                    if (files == 0) move(folder1);
-                    if (files == 1) move(folder2);
-                    if (files == 2) move(folder3);
+                    if (files == 0) moveNew(folder1);
+                    if (files == 1) moveNew(folder2);
+                    if (files == 2) moveNew(folder3);
                 }
                 return true;
             } else { return false; }
         }
-
+        /*
         private void move(string[] files) {
             int lenght = files.Length;
             int number = 0;
@@ -277,23 +250,48 @@ namespace TVSRenamer {
                     }
                 }
             }
-        }
-        private string path(int season, int episode, string name, int number) {
-            string path = null;
-            if (season < 10) {
-                path = location + "\\" + "Season " + "0" + (season + 1) + "\\" + number + System.IO.Path.GetFileName(name);
-                if (Directory.Exists(Path.GetDirectoryName(path)) == false) {
-                    Directory.CreateDirectory(Path.GetDirectoryName(path));
+        }*/
+        
+        private void moveNew(string[] files) {
+            List <string> names = new List<string>();
+            names.Add(showName);
+            names.Add(showName.Replace(' ','.'));
+            for (int n = 0; n < getNumberAliases();n++) {
+                names.Add(getAliases(n));
+                names.Add(getAliases(n).Replace(' ', '.'));
+            }
+            if (Path.GetFileName(location) != showName) {
+                defLoc = location;
+                Directory.CreateDirectory(location + "\\" + showName);
+                location = location + "\\" + showName;
+            }
+            for (int file = 0; file < files.Length; file++) { 
+                for (int i=0;i<names.Count(); i++) {
+                    if (files[file].IndexOf(names[i], StringComparison.OrdinalIgnoreCase) >= 0) {
+                        for (int e = 0; e < fileExtension.Length; e++) {
+                            isShowFile.Add(files[file]);
+                        }
+                    }
                 }
             }
-            if (season >= 10) {
-                path = location + "\\" + "Season " + (season + 1) + "\\" + number + System.IO.Path.GetFileName(name);
-                if (Directory.Exists(Path.GetDirectoryName(path)) == false) {
-                    Directory.CreateDirectory(Path.GetDirectoryName(path));
-                }
-            }
-            return path;
         }
+        /* private string path(string name) {
+             string path = null;
+             if (season < 10) {
+                 path = location + "\\" + "Season " + "0" + (season + 1) + "\\" + number + System.IO.Path.GetFileName(name);
+                 if (Directory.Exists(Path.GetDirectoryName(path)) == false) {
+                     Directory.CreateDirectory(Path.GetDirectoryName(path));
+                 }
+             }
+             if (season >= 10) {
+                 path = location + "\\" + "Season " + (season + 1) + "\\" + number + System.IO.Path.GetFileName(name);
+                 if (Directory.Exists(Path.GetDirectoryName(path)) == false) {
+                     Directory.CreateDirectory(Path.GetDirectoryName(path));
+                 }
+             }
+             return path;
+         }
+         */
         private string getAliases(int number) {
             string getName = info;
             JObject test = JObject.Parse(getName);
@@ -305,14 +303,14 @@ namespace TVSRenamer {
             }
 
         }
-
+        
         private int getNumberAliases() {
             string getName = info;
             JObject test = JObject.Parse(getName);
             return test["data"]["aliases"].Count();
         }
 
-        private void rename() {
+       /* private void rename() {
             string[] folders = new string[50];
             string[] files = new string[200];
             string name;
@@ -347,26 +345,56 @@ namespace TVSRenamer {
                     }
                 }
             }
+        }*/
+        private void renameNew(string[] files) {
+            string epName;
+            for (int file = 0; file < files.Count(); file++) {
+                for (int season = 0; season < namesCount; season++) {
+                    for (int episode = 0; episode < namesCount; episode++) {
+                        for (int variability = 0; variability < 3; variability++) {
+                            for (int ext = 0; ext < 10; ext++) {
+                                if (files[file].IndexOf(names[season, episode, variability], StringComparison.OrdinalIgnoreCase) >= 0 && files[file].IndexOf(fileExtension[ext], StringComparison.OrdinalIgnoreCase) >= 0) {
+                                    epName = getName(season, episode);
+                                    if (!files[file].Contains(epName)) { 
+                                        if (Int32.Parse(Properties.Settings.Default["Danger"].ToString()) == 1) {
+                                            try { File.Move(files[file],pathMove(season,fileExtension[ext],epName)); } catch (IOException) { MessageBox.Show("Check if file is not being used!"); }
+                                        } else { File.Move(files[file], pathMove(season, fileExtension[ext], epName)); }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
-
-        private string pathMove(int season, string name) {
+        private string pathMove(int season ,string extension,string epName) {
             string path = null;
             if (season < 10) {
-                path = location + "\\" + "Season " + "0" + (season + 1) + "\\" + name;
+                path = location + "\\" + "Season " + "0" + (season + 1) + "\\" + epName + extension;
                 if (Directory.Exists(Path.GetDirectoryName(path)) == false) {
                     Directory.CreateDirectory(Path.GetDirectoryName(path));
                 }
             }
             if (season >= 10) {
-                path = location + "\\" + "Season " + (season + 1) + "\\" + name;
+                path = location + "\\" + "Season " + (season + 1) + "\\" + epName + extension;
                 if (Directory.Exists(Path.GetDirectoryName(path)) == false) {
                     Directory.CreateDirectory(Path.GetDirectoryName(path));
                 }
             }
+            if (!File.Exists(path)) { return path; }
+            else {
+                int filenumber=1;
+                do {
+                    path = path + "_" + filenumber;
+                    filenumber++;
+                } while (File.Exists(path) == false);
+                
+            }
+           
             return path;
         }
 
-        private string getName(int season, int episode, string showName) {
+        private string getName(int season, int episode) {
             string name = null;
             string final = null;
             string info = DownloadFromApi.apiGet("https://api.thetvdb.com/series/" + TVID + "/episodes/query?airedSeason=" + season + "&airedEpisode=" + episode, token,0);
