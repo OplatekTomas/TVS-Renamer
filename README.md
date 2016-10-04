@@ -1,8 +1,7 @@
 # TVS-Renamer
 
-##DO NOT USE THIS RIGHT NOW! FOUND HUGE BUG! FIXING RIGHT NOW!##
 
-C# Written app that renames TV Show episodes. At least slight change is released daily.
+C# Written app that renames TV Show episodes. At least slight change is released weekly.
 
 episodes get renamed to format:
 
@@ -14,8 +13,15 @@ Futurama - S01E01 - Space Pilot 3000
 
 
 ##Changelog:##
+###Current version: 0.4 (30th September 2016)###
 
-###Current version: 0.3 (+- 19th September 2016)###
+-Added option to rename specific files
+
+-Bug fixes
+
+-Typo fixes all over the place
+
+###0.3 (+- 19th September 2016)###
 
 -Added feature to select TV Show manualy.
 
