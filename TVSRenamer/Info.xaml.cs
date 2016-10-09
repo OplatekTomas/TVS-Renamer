@@ -22,7 +22,7 @@ namespace TVSRenamer {
         }
 
         private void button_Click(object sender, RoutedEventArgs e) {
-            MessageBox.Show("v0.4 You can now rename specific files/episodes instead of whole folders, bug fixes (huge ones). Last major beta release. Bugfixes may come but nothing huge is on the way.\nv0.3 Added \"Select show\" feature, ability to search in downloads folder instead of just a database, slight UI change, bug fixes.\nv0.2.1 Huge bug fix, improved file searching algorithm, small code changes\nv0.2 API change, added function to search for files, ability to search using IMDb ID, MUCH MUCH better code, +- metric ton of bug fixes\n v0.1 Initial release!", "Changelog");
+            MessageBox.Show("v1.0 - Final version\nCode speed up! (Stuff that could take you minutes then takes couple of seconds now), Removed \"Found season\" - it never worked and was kinda useless. Max. number of files in folder increased. Moved database/downloads switch to settings. \n\nv0.4 \nYou can now rename specific files/episodes instead of whole folders, bug fixes (huge ones).\n\nv0.3\nAdded \"Select show\" feature, ability to search in downloads folder instead of just a database, slight UI change, bug fixes.\n\nv0.2.1\nHuge bug fix, improved file searching algorithm, small code changes\n\nv0.2\nAPI change, added function to search for files, ability to search using IMDb ID, MUCH MUCH better code, +- metric ton of bug fixes\n\nv0.1\nInitial release! (using TVMaze API)", "Changelog");
         }
 
         private void button1_Click(object sender, RoutedEventArgs e) {

@@ -21,28 +21,19 @@ namespace TVSRenamer {
     /// Interaction logic for OknoSettings.xaml
     /// </summary>
     public partial class OknoSettings : Window {
-        public OknoSettings() {
-            
+        public OknoSettings() {           
             InitializeComponent();
-
             try { textBox.Text = Properties.Settings.Default["Lokace1"].ToString();} catch (NullReferenceException) { }
             try { textBox1.Text = Properties.Settings.Default["Lokace2"].ToString();} catch (NullReferenceException) { }
             try { textBox2.Text = Properties.Settings.Default["Lokace3"].ToString(); } catch (NullReferenceException) { }
-            
-            
-
-
         }
         FolderBrowserDialog fbd1 = new FolderBrowserDialog();
         FolderBrowserDialog fbd2 = new FolderBrowserDialog();
         FolderBrowserDialog fbd3 = new FolderBrowserDialog();
-
         int saved=0;
         string location1;
         string location2;
         string location3;
-
-
 
         private void save() {
   
@@ -148,18 +139,36 @@ namespace TVSRenamer {
         }
 
         private void button2_Click(object sender, RoutedEventArgs e) {
-            MessageBox.Show("Danger Mode - Makes this app much much faster, but if any of files that you want to move/rename are in use THE APP WILL CRASH! (your files will be fine)\n\nEnter location of folders that will be searched for episodes/subtitles.\nThis can be useful when you search for subtitles in your \"Downloads\" folder\n\nPLEASE BE SPECIFIC!\nEnter folders like: \"D:\\Downloads\\\"\" instaed of just \"D:\\\"","help");
+            MessageBox.Show("Enter location of folders that will be searched for episodes or subtitles.\nThis can be useful when you search for subtitles in your \"Downloads\" folder, but your TV show is elsewhere\nPLEASE BE SPECIFIC!\nEnter folders like: \"D:\\Downloads\\\"\" instaed of just \"D:\\\"\n\nFiles option is kinda explains itself, but if you don't get it: Select Generic folder if want to rename episodes that are for example in \"Downloads folder\". Select the other option if there are files from only 1 TV show in selected folder.\nThis applies to location of folder you want to rename NOT to those 3 options in this window\n\nDanger Mode - Makes this app faster, but if any of files that you want to move / rename are in use THE APP WILL CRASH!(your files will be fine)\n\n", "Help");
         }
 
         private void checkBox_Checked(object sender, RoutedEventArgs e) {
         }
 
         private void Grid_Loaded(object sender, RoutedEventArgs e) {
-            if (Int32.Parse(Properties.Settings.Default["Danger"].ToString()) == 1) {
+            if (Properties.Settings.Default.Danger == 1) {
                 checkBox.IsChecked = true;
             } else {
                 checkBox.IsChecked = false;
             }
+        }
+
+        private void generic_Selected(object sender, RoutedEventArgs e) {
+            Properties.Settings.Default.folder = 0;
+            Properties.Settings.Default.Save();
+        }
+
+        private void specific_Selected(object sender, RoutedEventArgs e) {
+            Properties.Settings.Default.folder = 1;
+            Properties.Settings.Default.Save();
+
+        }
+
+        private void comboBox_Loaded(object sender, RoutedEventArgs e) {
+            if (Properties.Settings.Default.folder == 1) {
+                comboBox.SelectedIndex = 1;
+            } else { comboBox.SelectedIndex = 0; }
+           
         }
     }
 }

@@ -74,12 +74,12 @@ namespace TVSRenamer.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public int dbdown {
+        public int folder {
             get {
-                return ((int)(this["dbdown"]));
+                return ((int)(this["folder"]));
             }
             set {
-                this["dbdown"] = value;
+                this["folder"] = value;
             }
         }
         
