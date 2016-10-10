@@ -5,8 +5,6 @@ VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TVSRenamer", "TVSRenamer\TVSRenamer.csproj", "{78729533-C347-4A62-9373-73F5D08AB289}"
 EndProject
-Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "TVSRenamerSetup", "TVSRenamerSetup\TVSRenamerSetup.vdproj", "{05D9F5B7-B1EC-43BA-A45B-CDFD8735DE27}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -17,8 +15,6 @@ Global
 		{78729533-C347-4A62-9373-73F5D08AB289}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{78729533-C347-4A62-9373-73F5D08AB289}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{78729533-C347-4A62-9373-73F5D08AB289}.Release|Any CPU.Build.0 = Release|Any CPU
-		{05D9F5B7-B1EC-43BA-A45B-CDFD8735DE27}.Debug|Any CPU.ActiveCfg = Debug
-		{05D9F5B7-B1EC-43BA-A45B-CDFD8735DE27}.Release|Any CPU.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

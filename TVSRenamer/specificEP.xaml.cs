@@ -53,17 +53,17 @@ namespace TVSRenamer {
         }
 
         private void findShow_Click(object sender, RoutedEventArgs e) {
-                string showNameNoSpaces = textBox_Copy.Text.Replace(" ", "+");
-                string getName = DownloadFromApi.apiGet("https://api.thetvdb.com/search/series?name=" + showNameNoSpaces, tkn, 0);
-                info = getName;
-                if (info == "Error") {
-                    MessageBox.Show("Re-check your data or make sure that you are connected to the internet.");
-                } else { 
+            string showNameNoSpaces = textBox_Copy.Text.Replace(" ", "+");
+            string getName = DownloadFromApi.apiGet("https://api.thetvdb.com/search/series?name=" + showNameNoSpaces, tkn, 0);
+            info = getName;
+            if (info == "Error") {
+                MessageBox.Show("Re-check your data or make sure that you are connected to the internet.");
+            } else {
                 var w = new SelectShow(info);
                 w.ShowDialog();
                 ID = w.Return;
                 enableStart();
-                }
+            }
         }
 
         private void textBox3_TextChanged(object sender, TextChangedEventArgs e) {
@@ -74,15 +74,15 @@ namespace TVSRenamer {
             }
             enableStart();
         }
-        private void enableStart(){
-            if (textBox2.Text != "" && textBox3.Text != "" && ID != null &&File.Exists(textBox.Text)) { button2.IsEnabled = true; } else { button2.IsEnabled = false; }
+        private void enableStart() {
+            if (textBox2.Text != "" && textBox3.Text != "" && ID != null && File.Exists(textBox.Text)) { button2.IsEnabled = true; } else { button2.IsEnabled = false; }
         }
-       
-    private void button2_Click(object sender, RoutedEventArgs e) {
+
+        private void button2_Click(object sender, RoutedEventArgs e) {
             int season = Int32.Parse(textBox2.Text);
             int episode = Int32.Parse(textBox3.Text);
-            string name = DownloadFromApi.apiGet("https://api.thetvdb.com/series/" + ID + "/episodes/query?airedSeason=" + season + "&airedEpisode=" + episode,tkn,0);
-            string showName = DownloadFromApi.apiGet("https://api.thetvdb.com/series/" + ID,tkn,0);
+            string name = DownloadFromApi.apiGet("https://api.thetvdb.com/series/" + ID + "/episodes/query?airedSeason=" + season + "&airedEpisode=" + episode, tkn, 0);
+            string showName = DownloadFromApi.apiGet("https://api.thetvdb.com/series/" + ID, tkn, 0);
             JObject parsed = JObject.Parse(name);
             JObject parsedSN = JObject.Parse(info);
             name = parsed["data"][0]["episodeName"].ToString();
@@ -98,10 +98,21 @@ namespace TVSRenamer {
                 if (episode < 10) { name = showName + " - S" + season + "E0" + episode + " - " + name; }
                 if (episode >= 10) { name = showName + " - S" + season + "E" + episode + " - " + name; ; }
             }
-            try {
-                File.Move(path, Path.GetDirectoryName(path) + name + Path.GetExtension(path));
-                MessageBox.Show("File was renamed!");
-            } catch (IOException) { MessageBox.Show("Something went wrong\nAre you sure file " + path + " isn't being used?"); }
+            if (!File.Exists(path)) {
+            } else {
+                string nameOrig = name;
+                string ext = Path.GetExtension(path);
+                int filenumber = 1;
+                do {
+                    name = nameOrig + "_" + filenumber + ext;
+                    filenumber++;
+                } while (File.Exists(path));
+                try {
+                    File.Move(path, Path.GetDirectoryName(path) + "\\" + name + Path.GetExtension(path));
+                    MessageBox.Show("File was renamed!");
+                } catch (IOException) { MessageBox.Show("Something went wrong\nAre you sure file " + path + " isn't being used?"); }
+            }
         }
+
     }
 }
