@@ -10,12 +10,13 @@ using System.Windows;
 namespace TVSRenamer {
      public static class DownloadFromApi {
         public static string apiGet(string url, string token, int start) {
-            try {
+            
                 HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
                 request.Method = "GET";
                 request.Accept = "application/json";
                 request.Headers.Add("Accept-Language", "en");
                 request.Headers.Add("Authorization", "Bearer " + token);
+            try {
                 var response = request.GetResponse();
                 using (var sr = new StreamReader(response.GetResponseStream())) {
                     return sr.ReadToEnd();

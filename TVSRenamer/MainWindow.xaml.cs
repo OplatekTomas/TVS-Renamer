@@ -25,7 +25,6 @@ namespace TVSRenamer {
         string location;
         string showName;
         string TVID;
-        int subFolders;
         const int namesCount = 50;
         string[,,] names = new string[namesCount, namesCount, 4];
         string token = Properties.Settings.Default["Token"].ToString();
@@ -96,9 +95,9 @@ namespace TVSRenamer {
             var window = new OknoSettings { Owner = this };
             window.ShowDialog();
 
-            try { settings1 = TVSRenamer.Properties.Settings.Default["Lokace1"].ToString(); } catch (NullReferenceException) { settings1 = null; }
-            try { settings2 = TVSRenamer.Properties.Settings.Default["Lokace2"].ToString(); } catch (NullReferenceException) { settings2 = null; }
-            try { settings3 = TVSRenamer.Properties.Settings.Default["Lokace3"].ToString(); } catch (NullReferenceException) { settings3 = null; }
+            try { settings1 = Properties.Settings.Default["Lokace1"].ToString(); } catch (NullReferenceException) { settings1 = null; }
+            try { settings2 = Properties.Settings.Default["Lokace2"].ToString(); } catch (NullReferenceException) { settings2 = null; }
+            try { settings3 = Properties.Settings.Default["Lokace3"].ToString(); } catch (NullReferenceException) { settings3 = null; }
         }
 
         private void button1_Click(object sender, RoutedEventArgs e) {
@@ -203,7 +202,9 @@ namespace TVSRenamer {
                                     epName = getName(season + 1, episode + 1);
                                     if (!files[file].Contains(epName) && Path.GetDirectoryName(files[file]) != defLoc + "Season???") {
                                         if (Int32.Parse(Properties.Settings.Default["Danger"].ToString()) == 1) {
-                                            try { File.Move(files[file], pathMove(season, fileExtension[ext], epName)); } catch (IOException) { MessageBox.Show("Check if file is not being used!"); }
+                                            try {
+                                                File.Move(files[file], pathMove(season, fileExtension[ext], epName));
+                                            } catch (IOException) { MessageBox.Show("Check if file is not being used!"); }
                                         } else { File.Move(files[file], pathMove(season, fileExtension[ext], epName)); }
                                     }
                                 }
@@ -227,9 +228,17 @@ namespace TVSRenamer {
                     Directory.CreateDirectory(Path.GetDirectoryName(path));
                 }
             }
+            if (!File.Exists(path)) { return path; } else {
+                string name = Path.Combine(Path.GetDirectoryName(path),Path.GetFileNameWithoutExtension(path));
+                string ext = Path.GetExtension(path);
+                int filenumber = 1;
+                do {
+                    path = name + "_" + filenumber+ext;
+                    filenumber++;             
+                } while (File.Exists(path));
 
-
-            return path;
+                return path;
+            }
         }
 
         private string getName(int season, int episode) {
@@ -251,39 +260,52 @@ namespace TVSRenamer {
                 if (episode < 10) { final = showName + " - S" + season + "E0" + episode + " - " + name; }
                 if (episode >= 10) { final = showName + " - S" + season + "E" + episode + " - " + name; ; }
             }
-            if (!File.Exists(final)) { return final; } else {
-                int filenumber = 1;
-                do {
-                    final = final + "_" + filenumber;
-                    filenumber++;
-                } while (File.Exists(final) == false);
-                return final;
-            }
+           return final;
+            
+        }
+        private float directorySize(string folderPath) {
+            DirectoryInfo di = new DirectoryInfo(folderPath);
+            return (di.EnumerateFiles("*", SearchOption.AllDirectories).Sum(fi => fi.Length))/1000000;
         }
 
+        private void deleteIfEmpty(string[] files) {
+            for (int file = 0; file < files.Count(); file++) {
+                if (Directory.Exists(Path.GetDirectoryName(files[file]))) {
+                    if (directorySize(Path.GetDirectoryName(files[file])) < Properties.Settings.Default.maxSize) {
+                        Directory.Delete(Path.GetDirectoryName(files[file]),true);
+                    }
+                }
+            }
+        }
+       
         private void Start_Click(object sender, RoutedEventArgs e) {
+           //int test = directorySize("D:\\TVSRenamer");
+           location = TVLoc.Text;
             defLoc = location;
             generateSearch();
-            bool loaded=true;
+            List<String> isShowFileNoDuplicates = isShowFile.Distinct().ToList();
             if (settings1 != null || settings2 != null || settings3 != null || settings1 != "" || settings2 != "" || settings3 != "") {
                 search();
-                List<String> isShowFileNoDuplicates = isShowFile.Distinct().ToList();
+                isShowFileNoDuplicates = isShowFile.Distinct().ToList();
                 renameNew(isShowFileNoDuplicates.ToArray());
+                if (Properties.Settings.Default.Delete == true) {
+                    deleteIfEmpty(isShowFileNoDuplicates.ToArray());
+                }
             }
             List<string> files = new List<string>();
-            try {
-                files = System.IO.Directory.GetFiles(defLoc, "*.*", System.IO.SearchOption.AllDirectories).ToList<string>();
-            } catch (Exception) { loaded = false; }
-            if (loaded) {
-                if (Properties.Settings.Default.folder == 1) {
+            files = System.IO.Directory.GetFiles(defLoc, "*.*", System.IO.SearchOption.AllDirectories).ToList<string>();
+                if (Properties.Settings.Default.Folder == 1) {
                     renameNew(files.ToArray());
                 } else {
-                    isShowFile = null;
-                    moveNew(files.ToArray());
-                    List<String> isShowFileNoDuplicates = isShowFile.Distinct().ToList();
-                    renameNew(isShowFileNoDuplicates.ToArray());
+                isShowFile = null;
+                moveNew(files.ToArray());
+                isShowFileNoDuplicates = null;
+                isShowFileNoDuplicates = isShowFile.Distinct().ToList();
+                renameNew(isShowFileNoDuplicates.ToArray());
+                if (Properties.Settings.Default.Delete == true) {
+                    deleteIfEmpty(isShowFileNoDuplicates.ToArray());
                 }
-            } else { MessageBox.Show("Please make sure the folder isn't empty!"); }       
+            }     
             MessageBox.Show("Files that were found were probably renamed!", "Done");
         }
 

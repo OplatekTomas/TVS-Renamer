@@ -74,12 +74,12 @@ namespace TVSRenamer.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public int folder {
+        public int Folder {
             get {
-                return ((int)(this["folder"]));
+                return ((int)(this["Folder"]));
             }
             set {
-                this["folder"] = value;
+                this["Folder"] = value;
             }
         }
         
@@ -92,6 +92,30 @@ namespace TVSRenamer.Properties {
             }
             set {
                 this["Danger"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool Delete {
+            get {
+                return ((bool)(this["Delete"]));
+            }
+            set {
+                this["Delete"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int maxSize {
+            get {
+                return ((int)(this["maxSize"]));
+            }
+            set {
+                this["maxSize"] = value;
             }
         }
     }
