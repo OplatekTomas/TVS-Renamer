@@ -34,7 +34,6 @@ namespace TVSRenamer {
         List<string> isShowFile = new List<string>();
         FolderBrowserDialog fbd = new FolderBrowserDialog();
 
-
         private void generateSearch() {
             for (int season = 1; season <= namesCount; season++) {
                 for (int episode = 1; episode <= namesCount; episode++) {
@@ -279,8 +278,10 @@ namespace TVSRenamer {
         }
        
         private void Start_Click(object sender, RoutedEventArgs e) {
-           //int test = directorySize("D:\\TVSRenamer");
-           location = TVLoc.Text;
+            //int test = directorySize("D:\\TVSRenamer");
+            ProgressBarWindow pbw = new ProgressBarWindow();
+            pbw.Show();
+            location = TVLoc.Text;
             defLoc = location;
             generateSearch();
             List<String> isShowFileNoDuplicates = isShowFile.Distinct().ToList();
@@ -297,7 +298,7 @@ namespace TVSRenamer {
                 if (Properties.Settings.Default.Folder == 1) {
                     renameNew(files.ToArray());
                 } else {
-                isShowFile = null;
+                isShowFile = new List<string>();
                 moveNew(files.ToArray());
                 isShowFileNoDuplicates = null;
                 isShowFileNoDuplicates = isShowFile.Distinct().ToList();
