@@ -12,6 +12,9 @@ using TVSRenamer;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.ComponentModel;
+using System.Threading;
+using System.Windows.Threading;
 
 namespace TVSRenamer {
     /// <summary>
@@ -190,7 +193,7 @@ namespace TVSRenamer {
         }
 
 
-        private void renameNew(string[] files) {
+        private void renameNew(string[] files,ProgressBarWindow pbw) {
             string epName;
             for (int file = 0; file < files.Count(); file++) {
                 for (int season = 0; season < namesCount; season++) {
@@ -205,6 +208,9 @@ namespace TVSRenamer {
                                                 File.Move(files[file], pathMove(season, fileExtension[ext], epName));
                                             } catch (IOException) { MessageBox.Show("Check if file is not being used!"); }
                                         } else { File.Move(files[file], pathMove(season, fileExtension[ext], epName)); }
+                                        Dispatcher.Invoke(new Action(() =>{
+                                            pbw.bar.Value = 100 * ((float)file / (float)files.Count());
+                                        }),DispatcherPriority.Send);
                                     }
                                 }
                             }
@@ -212,6 +218,9 @@ namespace TVSRenamer {
                     }
                 }
             }
+            Dispatcher.Invoke(new Action(() => {
+                pbw.bar.Value = 100;
+            }), DispatcherPriority.Send);
         }
         private string pathMove(int season, string extension, string epName) {
             string path = null;
@@ -285,29 +294,46 @@ namespace TVSRenamer {
             defLoc = location;
             generateSearch();
             List<String> isShowFileNoDuplicates = isShowFile.Distinct().ToList();
+
+            Action rename;
+            rename = () => renameNew(isShowFileNoDuplicates.ToArray(),pbw);
+            Thread t = new Thread(rename.Invoke);
+            Thread t2 = new Thread(rename.Invoke);
+            Thread t3 = new Thread(rename.Invoke);
+
             if (settings1 != null || settings2 != null || settings3 != null || settings1 != "" || settings2 != "" || settings3 != "") {
                 search();
                 isShowFileNoDuplicates = isShowFile.Distinct().ToList();
-                renameNew(isShowFileNoDuplicates.ToArray());
+                t.Start();
+                //renameNew(isShowFileNoDuplicates.ToArray(),pbw);
                 if (Properties.Settings.Default.Delete == true) {
                     deleteIfEmpty(isShowFileNoDuplicates.ToArray());
                 }
             }
-            List<string> files = new List<string>();
-            files = System.IO.Directory.GetFiles(defLoc, "*.*", System.IO.SearchOption.AllDirectories).ToList<string>();
-                if (Properties.Settings.Default.Folder == 1) {
-                    renameNew(files.ToArray());
-                } else {
-                isShowFile = new List<string>();
-                moveNew(files.ToArray());
-                isShowFileNoDuplicates = null;
-                isShowFileNoDuplicates = isShowFile.Distinct().ToList();
-                renameNew(isShowFileNoDuplicates.ToArray());
-                if (Properties.Settings.Default.Delete == true) {
-                    deleteIfEmpty(isShowFileNoDuplicates.ToArray());
+
+            {
+                List<string> files = new List<string>();
+                files = System.IO.Directory.GetFiles(defLoc, "*.*", System.IO.SearchOption.AllDirectories).ToList<string>();
+                if (Properties.Settings.Default.Folder == 1)
+                {
+                    isShowFileNoDuplicates = files;
+                    //renameNew(files.ToArray(),pbw);
+                    t2.Start();
                 }
-            }     
-            MessageBox.Show("Files that were found were probably renamed!", "Done");
+                else
+                {
+                    isShowFile = new List<string>();
+                    moveNew(files.ToArray());
+                    isShowFileNoDuplicates = null;
+                    isShowFileNoDuplicates = isShowFile.Distinct().ToList();
+                   // renameNew(isShowFileNoDuplicates.ToArray(),pbw);
+                    t3.Start();
+                    if (Properties.Settings.Default.Delete == true)
+                    {
+                        deleteIfEmpty(isShowFileNoDuplicates.ToArray());
+                    }
+                }
+            }
         }
 
 
