@@ -156,9 +156,19 @@ namespace TVSRenamer {
             List<string> names = new List<string>();
             names.Add(showName);
             if (showName != showName.Replace(' ', '.')) { names.Add(showName.Replace(' ', '.')); }
+
             for (int n = 0; n < getNumberAliases(); n++) {
                 names.Add(getAliases(n));
                 if (getAliases(n) != getAliases(n).Replace(' ', '.')) { names.Add(getAliases(n).Replace(' ', '.')); }
+            }
+            for (int x = 0; x < names.Count(); x++) {
+                if (names[x].Contains("(") && names[x].Contains(")")) {
+                    string temp;
+                    temp = names[x].Replace("(", "");
+                    temp = temp.Replace(")","");
+                    names.Add(temp);
+                    
+                }
             }
             if (Path.GetFileName(location) != showName) {
                 defLoc = location;
@@ -172,7 +182,7 @@ namespace TVSRenamer {
                     }
                 }
             }
-        }
+        }     
  
         private string getAliases(int number) {
             string getName = info;
@@ -193,35 +203,43 @@ namespace TVSRenamer {
         }
 
 
-        private void renameNew(string[] files,ProgressBarWindow pbw) {
+        private void renameNew(string file) {
             string epName;
-            for (int file = 0; file < files.Count(); file++) {
-                for (int season = 0; season < namesCount; season++) {
-                    for (int episode = 0; episode < namesCount; episode++) {
-                        for (int variability = 0; variability < 3; variability++) {
-                            for (int ext = 0; ext < 10; ext++) {
-                                if (files[file].IndexOf(names[season, episode, variability], StringComparison.OrdinalIgnoreCase) >= 0 && files[file].IndexOf(fileExtension[ext], StringComparison.OrdinalIgnoreCase) >= 0) {
-                                    epName = getName(season + 1, episode + 1);
-                                    if (!files[file].Contains(epName) && Path.GetDirectoryName(files[file]) != defLoc + "Season???") {
-                                        if (Int32.Parse(Properties.Settings.Default["Danger"].ToString()) == 1) {
-                                            try {
-                                                File.Move(files[file], pathMove(season, fileExtension[ext], epName));
-                                            } catch (IOException) { MessageBox.Show("Check if file is not being used!"); }
-                                        } else { File.Move(files[file], pathMove(season, fileExtension[ext], epName)); }
-                                        Dispatcher.Invoke(new Action(() =>{
-                                            pbw.bar.Value = 100 * ((float)file / (float)files.Count());
-                                        }),DispatcherPriority.Send);
-                                    }
+            for (int season = 0; season < namesCount; season++) {
+                for (int episode = 0; episode < namesCount; episode++) {
+                    for (int variability = 0; variability < 3; variability++) {
+                        for (int ext = 0; ext < 10; ext++) {
+                            if (file.IndexOf(names[season, episode, variability], StringComparison.OrdinalIgnoreCase) >= 0 && file.IndexOf(fileExtension[ext], StringComparison.OrdinalIgnoreCase) >= 0) {
+                                epName = getName(season + 1, episode + 1);
+                                if (!file.Contains(epName) && Path.GetDirectoryName(file) != defLoc + "Season???") {
+                                    if (Int32.Parse(Properties.Settings.Default["Danger"].ToString()) == 1) {
+                                        try {
+                                            File.Move(file, pathMove(season, fileExtension[ext], epName));
+                                        } catch (IOException) { MessageBox.Show("Check if file is not being used!"); }
+                                    } else { File.Move(file, pathMove(season, fileExtension[ext], epName)); }                        
                                 }
                             }
                         }
                     }
                 }
+            }                 
+        }
+        private void renameRun(string[] files, ProgressBarWindow pbw) {
+            for (int file = 0; file < files.Count(); file++) {
+                renameNew(files[file]);
+                Dispatcher.Invoke(new Action(() => {
+                    pbw.bar.Value = 100 * ((float)file / (float)files.Count());
+                    pbw.txt.Text = files[file];
+                }), DispatcherPriority.Send);
             }
             Dispatcher.Invoke(new Action(() => {
                 pbw.bar.Value = 100;
+                if (Properties.Settings.Default.Delete == true) {
+                    deleteIfEmpty(files);
+                }
             }), DispatcherPriority.Send);
         }
+
         private string pathMove(int season, string extension, string epName) {
             string path = null;
             if (season < 10) {
@@ -287,56 +305,32 @@ namespace TVSRenamer {
         }
        
         private void Start_Click(object sender, RoutedEventArgs e) {
-            //int test = directorySize("D:\\TVSRenamer");
-            ProgressBarWindow pbw = new ProgressBarWindow();
-            pbw.Show();
             location = TVLoc.Text;
             defLoc = location;
             generateSearch();
             List<String> isShowFileNoDuplicates = isShowFile.Distinct().ToList();
 
-            Action rename;
-            rename = () => renameNew(isShowFileNoDuplicates.ToArray(),pbw);
-            Thread t = new Thread(rename.Invoke);
-            Thread t2 = new Thread(rename.Invoke);
-            Thread t3 = new Thread(rename.Invoke);
-
             if (settings1 != null || settings2 != null || settings3 != null || settings1 != "" || settings2 != "" || settings3 != "") {
                 search();
-                isShowFileNoDuplicates = isShowFile.Distinct().ToList();
-                t.Start();
-                //renameNew(isShowFileNoDuplicates.ToArray(),pbw);
-                if (Properties.Settings.Default.Delete == true) {
-                    deleteIfEmpty(isShowFileNoDuplicates.ToArray());
-                }
             }
-
             {
                 List<string> files = new List<string>();
                 files = System.IO.Directory.GetFiles(defLoc, "*.*", System.IO.SearchOption.AllDirectories).ToList<string>();
-                if (Properties.Settings.Default.Folder == 1)
-                {
-                    isShowFileNoDuplicates = files;
-                    //renameNew(files.ToArray(),pbw);
-                    t2.Start();
+                if (Properties.Settings.Default.Folder == 1) {
+                    isShowFile.AddRange(files);               
                 }
-                else
-                {
-                    isShowFile = new List<string>();
-                    moveNew(files.ToArray());
-                    isShowFileNoDuplicates = null;
-                    isShowFileNoDuplicates = isShowFile.Distinct().ToList();
-                   // renameNew(isShowFileNoDuplicates.ToArray(),pbw);
-                    t3.Start();
-                    if (Properties.Settings.Default.Delete == true)
-                    {
-                        deleteIfEmpty(isShowFileNoDuplicates.ToArray());
-                    }
+                else{
+                    moveNew(files.ToArray());           
                 }
+                isShowFileNoDuplicates.AddRange(isShowFile.Distinct());
+                ProgressBarWindow pbw = new ProgressBarWindow();
+                pbw.Show();
+                Action rename;
+                rename = () => renameRun(isShowFileNoDuplicates.ToArray(), pbw);
+                Thread thread = new Thread(rename.Invoke);
+                thread.Start();               
             }
         }
-
-
         private void ComboBox_Loaded(object sender, RoutedEventArgs e) {
             List<string> data = new List<string>();
             data.Add("Downloads folder");

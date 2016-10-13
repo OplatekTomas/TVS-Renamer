@@ -5,10 +5,11 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TVSRenamer"
         mc:Ignorable="d"
-        Title="ProgressBarWindow" Height="120" Width="300" Background="#FFB4B4B4">
+        Title="Working!" Height="145" Width="500" Background="#FFB4B4B4">
     <Grid>
-        <TextBlock HorizontalAlignment="Center" Height="23" Margin="0,20,0,0" TextWrapping="Wrap" Text="We're doing the hard work" VerticalAlignment="Top"/>
-        <ProgressBar x:Name="bar" HorizontalAlignment="Center" Height="20" Margin="0,0,0,20" VerticalAlignment="Bottom" Width="240"/>
+        <TextBlock HorizontalAlignment="Right" Height="20" Margin="0,15,21,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="450" Text="Working on file:"/>
+        <ProgressBar x:Name="bar" HorizontalAlignment="Center" Height="20" Margin="0,0,0,20" VerticalAlignment="Bottom" Width="450" ValueChanged="bar_ValueChanged" />
+        <TextBlock x:Name="txt" HorizontalAlignment="Left" Margin="14,35,0,0" VerticalAlignment="Top" Height="34" Width="457"/>
 
     </Grid>
 </Window>

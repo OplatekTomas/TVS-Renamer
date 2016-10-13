@@ -23,5 +23,12 @@ namespace TVSRenamer
         {
             InitializeComponent();
         }
+
+        private void bar_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) {
+            if (bar.Value == 100) {
+                MessageBox.Show("Files that were found were probably renamed!");
+                this.Close();
+            }
+        }
     }
 }
