@@ -94,24 +94,24 @@ namespace TVSRenamer {
             if (season < 10) {
                 if (episode < 10) { name = showName + " - S0" + season + "E0" + episode + " - " + name; }
                 if (episode >= 10) { name = showName + " - S0" + season + "E" + episode + " - " + name; }
-            } else if (season < 10) {
+            } else if (season > 10) {
                 if (episode < 10) { name = showName + " - S" + season + "E0" + episode + " - " + name; }
                 if (episode >= 10) { name = showName + " - S" + season + "E" + episode + " - " + name; ; }
             }
-            if (!File.Exists(path)) {
+            string origPath = Path.GetDirectoryName(path);
+            string ext = Path.GetExtension(path);
+            string newPath = origPath + "\\" + name + ext;
+            if (!File.Exists(name)) {
+                File.Move(path, newPath);
             } else {
-                string nameOrig = name;
-                string ext = Path.GetExtension(path);
                 int filenumber = 1;
                 do {
-                    name = nameOrig + "_" + filenumber + ext;
+                    newPath = origPath+ "\\" + name + "_" + filenumber + ext;
                     filenumber++;
-                } while (File.Exists(path));
-                try {
-                    File.Move(path, Path.GetDirectoryName(path) + "\\" + name + Path.GetExtension(path));
-                    MessageBox.Show("File was renamed!");
-                } catch (IOException) { MessageBox.Show("Something went wrong\nAre you sure file " + path + " isn't being used?"); }
+                } while (File.Exists(newPath));
+                File.Move(path,newPath);
             }
+            MessageBox.Show("File at:\n"+path+"\nWas renamed to:\n" + newPath);
         }
 
     }

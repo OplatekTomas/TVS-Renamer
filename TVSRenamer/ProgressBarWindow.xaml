@@ -5,11 +5,14 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TVSRenamer"
         mc:Ignorable="d"
-        Title="Working!" Height="145" Width="500" Background="#FFB4B4B4">
+        Title="Working!" Height="133.5" Width="500" Background="#FFB4B4B4"
+        MinHeight="133.5"
+        MinWidth="500">
     <Grid>
-        <TextBlock HorizontalAlignment="Right" Height="20" Margin="0,15,21,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="450" Text="Working on file:"/>
-        <ProgressBar x:Name="bar" HorizontalAlignment="Center" Height="20" Margin="0,0,0,20" VerticalAlignment="Bottom" Width="450" ValueChanged="bar_ValueChanged" />
-        <TextBlock x:Name="txt" HorizontalAlignment="Left" Margin="14,35,0,0" VerticalAlignment="Top" Height="34" Width="457"/>
+        <TextBlock Height="20" Margin="21,15,21,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="auto" Text="Working on file:"/>
+        <ProgressBar x:Name="bar" Height="20" Margin="21,66,21,0" VerticalAlignment="Top" Width="auto"/>
+        <TextBlock x:Name="txt" Margin="21,40,21,0" VerticalAlignment="Top" Height="21"/>
+        <Label x:Name="label" Content="Please dont close this window!" HorizontalAlignment="Right" Margin="0,10,21,0" VerticalAlignment="Top"/>
 
     </Grid>
 </Window>

@@ -152,6 +152,7 @@ namespace TVSRenamer {
             } catch (ArgumentException) { }
             moveNew(files.ToArray());
         }
+
         private void moveNew(string[] files) {
             List<string> names = new List<string>();
             names.Add(showName);
@@ -161,13 +162,11 @@ namespace TVSRenamer {
                 names.Add(getAliases(n));
                 if (getAliases(n) != getAliases(n).Replace(' ', '.')) { names.Add(getAliases(n).Replace(' ', '.')); }
             }
+            Regex reg = new Regex(@"\([0-9]{4}\)");
             for (int x = 0; x < names.Count(); x++) {
-                if (names[x].Contains("(") && names[x].Contains(")")) {
-                    string temp;
-                    temp = names[x].Replace("(", "");
-                    temp = temp.Replace(")","");
-                    names.Add(temp);
-                    
+                Match regMatch = reg.Match(names[x]);
+                if (regMatch.Success) {
+                   names.Add(reg.Replace(names[x], ""));
                 }
             }
             if (Path.GetFileName(location) != showName) {
@@ -237,7 +236,10 @@ namespace TVSRenamer {
                 if (Properties.Settings.Default.Delete == true) {
                     deleteIfEmpty(files);
                 }
+                MessageBox.Show("Files that were found were renamed");
+                pbw.Close();
             }), DispatcherPriority.Send);
+            
         }
 
         private string pathMove(int season, string extension, string epName) {
@@ -328,6 +330,7 @@ namespace TVSRenamer {
                 Action rename;
                 rename = () => renameRun(isShowFileNoDuplicates.ToArray(), pbw);
                 Thread thread = new Thread(rename.Invoke);
+                thread.Name = "Progress bar";
                 thread.Start();               
             }
         }
