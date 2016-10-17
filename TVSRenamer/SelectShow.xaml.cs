@@ -12,12 +12,13 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using Newtonsoft.Json.Linq;
+using System.Globalization;
 
 namespace TVSRenamer {
     /// <summary>
     /// Interaction logic for SelectShow.xaml
     /// </summary>
-    
+
     public partial class SelectShow : Window {
         public SelectShow(string show) {
             info = show;
@@ -27,7 +28,7 @@ namespace TVSRenamer {
         string final;
         string info = null;
         string[] showInfo = new string[15];
-        private void next(string value,string airDate,string infoShow,string id) {
+        private void next(string value, string airDate, string infoShow, string id) {
             Grid polozka = new Grid();
             polozka.Height = 32;
             Seznam.Children.Add(polozka);
@@ -37,13 +38,13 @@ namespace TVSRenamer {
             TextBlock txtShow = new TextBlock();
             TextBlock txtAired = new TextBlock();
             TextBlock air = new TextBlock();
-            //Selected button - basicly done.
+            //Selected button
             confirm.Margin = new Thickness(376, 10, 10, 2);
             confirm.Width = 75;
             confirm.Click += (s, e) => { selected(id); };
             confirm.Content = "Select";
             polozka.Children.Add(confirm);
-            //Info button - Function missing so far
+            //Info button 
             info.Margin = new Thickness(296, 10, 0, 0);
             info.Content = "More Info";
             info.Click += (s, e) => { infoWin(infoShow); };
@@ -83,36 +84,39 @@ namespace TVSRenamer {
             this.Close();
             final = name;
         }
-        public string Return{
+        public string Return
+        {
             get { return final; }
         }
         private void infoWin(string infoShow) {
             var w = new MoreInfo(infoShow);
             w.ShowDialog();
         }
+
+        struct Shows {
+            public string specificInfo;
+            public string showName;
+            public DateTime date;
+            public string id;
+        }
+
         private void generate() {
             JObject parse = JObject.Parse(info);
-            JObject parse2 = JObject.Parse(info);
-            JObject parse3 = JObject.Parse(info);
-            JObject parse4 = JObject.Parse(info);
-            int height=0;
-            
-            for (int i = 0; i < 16; i++) {
-                try {
-                    var specificInfo = parse["data"][i];
-                    var showName = parse2["data"][i]["seriesName"];
-                    var airDate = parse3["data"][i]["firstAired"];
-                    var ID = parse4["data"][i]["id"];
-                    height++;
-                    string date =airDate.ToString().Replace('-', '.');
-                    next(showName.ToString(), date, specificInfo.ToString(),ID.ToString());
-                } catch (ArgumentOutOfRangeException) {
-
-                }
+            int numberOfShows = parse["data"].Count();
+            Shows[] show = new Shows[numberOfShows];
+            for (int i = 0; i < numberOfShows; i++) {
+                show[i].specificInfo = parse["data"][i].ToString();
+                show[i].showName = parse["data"][i]["seriesName"].ToString();
+                show[i].date = DateTime.ParseExact(parse["data"][i]["firstAired"].ToString(), "yyyy-MM-dd", CultureInfo.InvariantCulture);
+                show[i].id = parse["data"][i]["id"].ToString();
             }
-            
-            this.Height = (height + 1) * 32 + 10;
-            Seznam.Height = (height + 1) * 32 + 10;
+            Array.Sort<Shows>(show, (x, y) => x.date.CompareTo(y.date));
+            Array.Reverse(show);
+            for (int x = 0; x < numberOfShows; x++) {
+                next(show[x].showName, show[x].date.ToString("dd.MM.yyyy"), show[x].specificInfo, show[x].id);
+            }
+            this.Height = (numberOfShows + 1) * 32 + 10;
+            Seznam.Height = (numberOfShows + 1) * 32 + 10;            
         }
     }
 }
