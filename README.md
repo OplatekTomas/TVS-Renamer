@@ -5,7 +5,7 @@ C# Written app that renames TV Show episodes. At least slight change is released
 
 episodes get renamed to format:
 
-**$ShowName** - S**$SeasonNumer**E**$EpisodeNumber** - **$EpisodeName**
+**[ShowName]** - S**[SeasonNumer]**E**[EpisodeNumber]** - **[EpisodeName]**
 
 Example:
 
@@ -13,44 +13,60 @@ Futurama - S01E01 - Space Pilot 3000
 
 
 ##Changelog:##
-###Current version: 0.4 (30th September 2016)###
+###Current version: v1.0.0 (17th October 2016)###
 
--Added option to rename specific files
+- Progress bar (with help from TheNumerus)
 
--Bug fixes
+- Folders can be deleted after files were moved from it
 
--Typo fixes all over the place
+- Removed found seasons - it never worked and weas kinda useless anyway
 
-###0.3 (+- 19th September 2016)###
+- Database/Downloads switch moved to settings
 
--Added feature to select TV Show manualy.
+- Max number of files in folder is now unlimited
 
--Added ability to search through a downloads folder instead of just a database
+- Code speed up!
 
--Bug fixes
+- Bug fixes
 
--Slight Changes in UI
+###v0.4 (30th September 2016)###
 
-###0.2.1 (+- 14th September 2016) (This version and older were hosted on different Git)###
+- Added option to rename specific files
 
--Huge bug fix
+- Bug fixes
 
--improved file searching alhorithm
+- Typo fixes all over the place
 
--small code changes
+###v0.3 (+- 19th September 2016)###
 
-###0.2 (+- September 2016)###
+- Added feature to select TV Show manualy.
 
--API change (TheTVDB.com)
+- Added ability to search through a downloads folder instead of just a database
 
--Added function to search for files.
+- Bug fixes
 
--Added ability to search using IMDb ID
+- Slight Changes in UI
 
--MUCH better code
+###v0.2.1 (+- 14th September 2016) (This version and older were hosted on different Git)###
 
--Ton of bug fixes
+- Huge bug fix
 
-###0.1 (+- July 2016)###
+- improved file searching alhorithm
 
--Initial release 
+- small code changes
+
+###v0.2 (+- September 2016)###
+
+- API change (TheTVDB.com)
+
+- Added function to search for files.
+
+- Added ability to search using IMDb ID
+
+- MUCH better code
+
+- Ton of bug fixes
+
+###v0.1 (+- July 2016)###
+
+- Initial release 
