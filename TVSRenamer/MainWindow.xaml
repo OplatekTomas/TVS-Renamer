@@ -23,7 +23,7 @@
         <Button x:Name="InfoBtn" Content="Info" HorizontalAlignment="Left" Margin="97,0,0,0" VerticalAlignment="Top" Width="75" Click="InfoBtn_Click" Grid.Column="1"/>
         <TextBlock x:Name="textBlock2" HorizontalAlignment="Left" Margin="404,33,0,0" TextWrapping="Wrap" Text="TV Show name:" VerticalAlignment="Top" Width="111"/>
         <TextBlock x:Name="textShowName" HorizontalAlignment="Left" Margin="520,33,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="187" Grid.ColumnSpan="2"/>
-        <CheckBox x:Name="checkBox" Content="Search using IMDb ID" HorizontalAlignment="Left" Margin="404,61,0,0" VerticalAlignment="Top" Height="17" Width="152" Checked="checkBox_Checked" Grid.ColumnSpan="2"/>
+        <CheckBox x:Name="checkBox" Content="Search using IMDb ID" HorizontalAlignment="Left" Margin="404,61,0,0" VerticalAlignment="Top" Height="17" Width="152" Grid.ColumnSpan="2"/>
         <Button x:Name="specific" Content="Rename Specific EP" HorizontalAlignment="Left" Margin="38,84,0,0" VerticalAlignment="Top" Width="115" Height="23" Click="specific_Click" IsEnabled="True" Grid.Column="1"/>
 
 

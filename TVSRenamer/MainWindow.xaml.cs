@@ -33,7 +33,6 @@ namespace TVSRenamer {
         string token = Properties.Settings.Default["Token"].ToString();
         string[] fileExtension = new string[10] { ".mkv", ".srt", ".m4v", ".avi", ".mp4", ".mov", ".sub", ".wmv", ".flv", ".idx" };
         string info;
-        string defLoc;
         List<string> isShowFile = new List<string>();
         FolderBrowserDialog fbd = new FolderBrowserDialog();
 
@@ -136,7 +135,7 @@ namespace TVSRenamer {
             Start.IsEnabled = false;
             if (Directory.Exists(location) & showName != null) {
                 button1.IsEnabled = true;
-            } else { button1.IsEnabled = false; 
+            } else { button1.IsEnabled = false;
             }
         }
         private void search() {
@@ -166,13 +165,12 @@ namespace TVSRenamer {
             for (int x = 0; x < names.Count(); x++) {
                 Match regMatch = reg.Match(names[x]);
                 if (regMatch.Success) {
-                   names.Add(reg.Replace(names[x], ""));
+                    names.Add(reg.Replace(names[x], ""));
                 }
             }
-            if (Path.GetFileName(location) != showName) {
-                defLoc = location;
-                Directory.CreateDirectory(location + "\\" + showName);
-                location = location + "\\" + showName;
+            if (Path.GetFileName(location) != showName || Path.GetFileName(location) != removeYear(showName)) {
+                Directory.CreateDirectory(location + "\\" + removeYear(showName));
+                location = location + "\\" + removeYear(showName);
             }
             for (int file = 0; file < files.Length; file++) {
                 for (int i = 0; i < names.Count(); i++) {
@@ -181,8 +179,8 @@ namespace TVSRenamer {
                     }
                 }
             }
-        }     
- 
+        }
+
         private string getAliases(int number) {
             string getName = info;
             JObject test = JObject.Parse(getName);
@@ -210,18 +208,18 @@ namespace TVSRenamer {
                         for (int ext = 0; ext < 10; ext++) {
                             if (file.IndexOf(names[season, episode, variability], StringComparison.OrdinalIgnoreCase) >= 0 && file.IndexOf(fileExtension[ext], StringComparison.OrdinalIgnoreCase) >= 0) {
                                 epName = getName(season + 1, episode + 1);
-                                if (!file.Contains(epName) && Path.GetDirectoryName(file) != defLoc + "Season???") {
+                                if (!file.Contains(epName) && Path.GetDirectoryName(file) != location + "Season???") {
                                     if (Int32.Parse(Properties.Settings.Default["Danger"].ToString()) == 1) {
                                         try {
                                             File.Move(file, pathMove(season, fileExtension[ext], epName));
                                         } catch (IOException) { MessageBox.Show("Check if file is not being used!"); }
-                                    } else { File.Move(file, pathMove(season, fileExtension[ext], epName)); }                        
+                                    } else { File.Move(file, pathMove(season, fileExtension[ext], epName)); }
                                 }
                             }
                         }
                     }
                 }
-            }                 
+            }
         }
         private void renameRun(string[] files, ProgressBarWindow pbw) {
             for (int file = 0; file < files.Count(); file++) {
@@ -239,7 +237,7 @@ namespace TVSRenamer {
                 MessageBox.Show("Files that were found were renamed");
                 pbw.Close();
             }), DispatcherPriority.Send);
-            
+
         }
 
         private string pathMove(int season, string extension, string epName) {
@@ -257,18 +255,24 @@ namespace TVSRenamer {
                 }
             }
             if (!File.Exists(path)) { return path; } else {
-                string name = Path.Combine(Path.GetDirectoryName(path),Path.GetFileNameWithoutExtension(path));
+                string name = Path.Combine(Path.GetDirectoryName(path), Path.GetFileNameWithoutExtension(path));
                 string ext = Path.GetExtension(path);
                 int filenumber = 1;
                 do {
-                    path = name + "_" + filenumber+ext;
-                    filenumber++;             
+                    path = name + "_" + filenumber + ext;
+                    filenumber++;
                 } while (File.Exists(path));
 
                 return path;
             }
         }
-
+        private string removeYear(string name) {
+            Regex reg = new Regex(@"\([0-9]{4}\)");
+            Match regMatch = reg.Match(name);
+            if (regMatch.Success) {
+                return reg.Replace(name, "");
+            } else { return name; }
+        }
         private string getName(int season, int episode) {
             string name = null;
             string final = null;
@@ -279,39 +283,40 @@ namespace TVSRenamer {
             foreach (char znak in invalid) {
                 name = name.Replace(znak.ToString(), "");
             }
+            string nameOfShow = removeYear(showName);
             if (season < 10) {
                 new System.IO.FileInfo(location + "\\" + "Season 0" + season).Directory.Create();
-                if (episode < 10) { final = showName + " - S0" + season + "E0" + episode + " - " + name; }
-                if (episode >= 10) { final = showName + " - S0" + season + "E" + episode + " - " + name; }
+                if (episode < 10) { final = nameOfShow + " - S0" + season + "E0" + episode + " - " + name; }
+                if (episode >= 10) { final = nameOfShow + " - S0" + season + "E" + episode + " - " + name; }
             } else if (season < 10) {
                 new System.IO.FileInfo(location + "\\" + "Season 0" + season).Directory.Create();
-                if (episode < 10) { final = showName + " - S" + season + "E0" + episode + " - " + name; }
-                if (episode >= 10) { final = showName + " - S" + season + "E" + episode + " - " + name; ; }
+                if (episode < 10) { final = nameOfShow + " - S" + season + "E0" + episode + " - " + name; }
+                if (episode >= 10) { final = nameOfShow + " - S" + season + "E" + episode + " - " + name; ; }
             }
-           return final;
-            
+            return final;
+
         }
         private float directorySize(string folderPath) {
             DirectoryInfo di = new DirectoryInfo(folderPath);
-            return (di.EnumerateFiles("*", SearchOption.AllDirectories).Sum(fi => fi.Length))/1000000;
+            return (di.EnumerateFiles("*", SearchOption.AllDirectories).Sum(fi => fi.Length)) / 1000000;
         }
 
         private void deleteIfEmpty(string[] files) {
             for (int file = 0; file < files.Count(); file++) {
                 if (Directory.Exists(Path.GetDirectoryName(files[file]))) {
                     if (directorySize(Path.GetDirectoryName(files[file])) < Properties.Settings.Default.maxSize) {
-                        Directory.Delete(Path.GetDirectoryName(files[file]),true);
+                        Directory.Delete(Path.GetDirectoryName(files[file]), true);
                     }
                 }
             }
         }
-       
+
         private void Start_Click(object sender, RoutedEventArgs e) {
             location = TVLoc.Text;
-            defLoc = location;
+            string defLoc = location;
             generateSearch();
-            List<String> isShowFileNoDuplicates = isShowFile.Distinct().ToList();
-
+            List<String> isShowFileNoDuplicates = new List<string>();
+            isShowFile = new List<string>();
             if (settings1 != null || settings2 != null || settings3 != null || settings1 != "" || settings2 != "" || settings3 != "") {
                 search();
             }
@@ -319,10 +324,9 @@ namespace TVSRenamer {
                 List<string> files = new List<string>();
                 files = System.IO.Directory.GetFiles(defLoc, "*.*", System.IO.SearchOption.AllDirectories).ToList<string>();
                 if (Properties.Settings.Default.Folder == 1) {
-                    isShowFile.AddRange(files);               
-                }
-                else{
-                    moveNew(files.ToArray());           
+                    isShowFile.AddRange(files);
+                } else {
+                    moveNew(files.ToArray());
                 }
                 isShowFileNoDuplicates.AddRange(isShowFile.Distinct());
                 ProgressBarWindow pbw = new ProgressBarWindow();
@@ -331,7 +335,7 @@ namespace TVSRenamer {
                 rename = () => renameRun(isShowFileNoDuplicates.ToArray(), pbw);
                 Thread thread = new Thread(rename.Invoke);
                 thread.Name = "Progress bar";
-                thread.Start();               
+                thread.Start();
             }
         }
         private void ComboBox_Loaded(object sender, RoutedEventArgs e) {
@@ -340,20 +344,18 @@ namespace TVSRenamer {
             data.Add("TV Show folder");
             var comboBox = sender as System.Windows.Controls.ComboBox;
             comboBox.ItemsSource = data;
-            int setOption = Int32.Parse(TVSRenamer.Properties.Settings.Default["dbdown"].ToString());           
+            int setOption = Int32.Parse(TVSRenamer.Properties.Settings.Default["dbdown"].ToString());
             comboBox.SelectedIndex = setOption;
 
         }
 
-        private void checkBox_Checked(object sender, RoutedEventArgs e) {
-            
-        }
         private void specific_Click(object sender, RoutedEventArgs e) {
             var window = new specificEP(token) { Owner = this };
             window.ShowDialog();
-            
+
         }
 
+      
         private void Grid_Loaded(object sender, RoutedEventArgs e) {
             string info = DownloadFromApi.apiGet("https://api.thetvdb.com/search/series?name=The%20100", token, 1);
             if (info == null) {
