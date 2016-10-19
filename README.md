@@ -19,7 +19,7 @@ Futurama - S01E01 - Space Pilot 3000
 
 - Folders can be deleted after files were moved from it
 
-- Removed found seasons - it never worked and weas kinda useless anyway
+- Removed found seasons - it never worked and was kinda useless anyway
 
 - Database/Downloads switch moved to settings
 
