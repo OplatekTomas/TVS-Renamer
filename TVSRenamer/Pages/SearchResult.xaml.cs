@@ -10,16 +10,15 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace TVSRenamer
-{
+namespace TVSRenamer {
     /// <summary>
-    /// Interaction logic for ProgressBarWindow.xaml
+    /// Interakční logika pro SearchResult.xaml
     /// </summary>
-    public partial class ProgressBarWindow : Window
-    {
-        public ProgressBarWindow() {
+    public partial class SearchResult : UserControl {
+        public SearchResult() {
             InitializeComponent();
         }
     }
