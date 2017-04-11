@@ -10,10 +10,10 @@
         <Border CornerRadius="5" Background="#333333">
             <Grid Margin="2">
                 <TextBlock x:Name="MainText" Margin="5,2,100,0" Foreground="White" Text="wefwef" FontSize="16"/>
-                <Grid Margin="35,3" HorizontalAlignment="Right">
+                <Grid Margin="35,3" x:Name="Details" HorizontalAlignment="Right">
                     <Image Source="../Icons/info.png"/>
                 </Grid>
-                <Grid Margin="5,3" HorizontalAlignment="Right">
+                <Grid Margin="5,3" x:Name="Selected" HorizontalAlignment="Right">
                     <Image Source="../Icons/success.png"/>
                 </Grid>
             </Grid>

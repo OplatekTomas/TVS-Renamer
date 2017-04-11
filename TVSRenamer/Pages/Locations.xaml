@@ -4,11 +4,73 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:TVSRenamer"
-      mc:Ignorable="d" 
-      d:DesignHeight="300" d:DesignWidth="300"
-      Title="Locations">
+      mc:Ignorable="d" d:DesignWidth="1024" d:DesignHeight="576"
+      Title="Locations" >
 
     <Grid>
-        
+        <Grid.RowDefinitions>
+            <RowDefinition Height="30px"/>
+            <RowDefinition Height="30* "/>
+        </Grid.RowDefinitions>
+        <Grid Background="#E53935" Grid.Row="0">
+            <Grid Margin="5" x:Name="Back" HorizontalAlignment="Left" MouseLeftButtonUp="Back_MouseLeftButtonUp">
+                <Image Source="../Icons/back.png"></Image>
+            </Grid>
+            <TextBlock x:Name="ShowName" Text="" Foreground="White" FontSize="18" Margin="40,2,0,2" HorizontalAlignment="Left" Width="974" />
+            <Grid Margin="3" x:Name="Info" HorizontalAlignment="Right" MouseLeftButtonUp="Info_MouseLeftButtonUp">
+                <Image Source="../Icons/info.png"></Image>
+            </Grid>
+            <Grid Margin="35,3" x:Name="GitHub" HorizontalAlignment="Right" MouseLeftButtonUp="GitHub_MouseLeftButtonUp">
+                <Image Source="../Icons/github-logo.png"></Image>
+            </Grid>
+        </Grid>
+        <Grid Grid.Row="1" Loaded="Grid_Loaded">
+            <TextBlock Margin="11,5,100,0" Height="25" VerticalAlignment="Top" Foreground="White" FontSize="16" Text="Location of TV Show:" />
+            <TextBox Background="#333333" x:Name="TextBox" BorderThickness="0" Margin="10,30,80,0" Height="25" VerticalAlignment="Top" Foreground="White" FontSize="16"></TextBox>
+            <Grid Height="25" HorizontalAlignment="Right" Width="60" VerticalAlignment="Top" Margin="10,30" x:Name="SelectLocation" MouseUp="SelectLocation_MouseUp">
+                <Border Background="#B71C1C" CornerRadius="3">
+                    <TextBlock Foreground="White" Text="Select" HorizontalAlignment="Center" FontSize="14" />
+                </Border>
+            </Grid>
+
+            <TextBlock Margin="11,75,100,0" Height="25" VerticalAlignment="Top" Foreground="White" FontSize="16" Text="Other locations that will be scanned for files: (Downloads folder)" />
+            <TextBox Background="#333333" x:Name="Loc1" BorderThickness="0" Margin="10,100,80,0" Height="25" VerticalAlignment="Top" Foreground="White" FontSize="16"></TextBox>
+            <Grid Height="25" HorizontalAlignment="Right" Width="60" VerticalAlignment="Top" Margin="10,100" x:Name="Loc1Select" MouseUp="Loc1Select_MouseUp">
+                <Border Background="#B71C1C" CornerRadius="3">
+                    <TextBlock Foreground="White" Text="Select" HorizontalAlignment="Center" FontSize="14" />
+                </Border>
+            </Grid>
+            <TextBox Background="#333333" x:Name="Loc2" BorderThickness="0" Margin="10,135,80,0" Height="25" VerticalAlignment="Top" Foreground="White" FontSize="16"></TextBox>
+            <Grid Height="25" Width="60" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="10,135,10,0" MouseUp="Loc2Select_MouseUp">
+                <Border Background="#B71C1C" CornerRadius="3" x:Name="Loc2Select">
+                    <TextBlock Foreground="White" Text="Select" HorizontalAlignment="Center" FontSize="14" />
+                </Border>
+            </Grid>
+            <TextBox Background="#333333" x:Name="Loc3" BorderThickness="0" Margin="10,170,80,0" Height="25" VerticalAlignment="Top" Foreground="White" FontSize="16"></TextBox>
+            <Grid Height="25" HorizontalAlignment="Right" Width="60" VerticalAlignment="Top" Margin="10,170,10,0" x:Name="Loc3Select" MouseUp="Loc3Select_MouseUp">
+                <Border Background="#B71C1C" CornerRadius="3">
+                    <TextBlock Foreground="White" Text="Select" HorizontalAlignment="Center" FontSize="14" />
+                </Border>
+            </Grid>
+            <CheckBox x:Name="checkDelete" HorizontalAlignment="Left" Margin="10,220,0,0" VerticalAlignment="Top" FontSize="16" Foreground="White" Width="380" >
+                <TextBlock Margin="0,-3">
+                   Delete folder after moving file if it's is smaller then
+                </TextBlock>
+            </CheckBox>
+            <TextBox Background="#333333" x:Name="FolderSizeBox" BorderThickness="0" Margin="395,215,0,0" HorizontalAlignment="Left" Width="45" Height="25" VerticalAlignment="Top" Foreground="White" FontSize="16"></TextBox>
+            <TextBlock Text="MB" HorizontalAlignment="Left" Margin="450,217,0,0" VerticalAlignment="Top" FontSize="16" Foreground="White"/>
+            <Grid x:Name="StartButton" Height="45" Width="45" Grid.Row="1" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="20,15" MouseUp="StartButton_MouseUp">
+                <Ellipse Fill="#B71C1C">
+                    <Ellipse.Effect>
+                        <DropShadowEffect Color="Black" BlurRadius="10" ShadowDepth="6" Opacity="0.6"  />
+                    </Ellipse.Effect>
+                </Ellipse>
+                <Image Source="../Icons/back.png" Margin="32.5,0,0,0" Width="20" Height="20" >
+                    <Image.RenderTransform>
+                        <ScaleTransform ScaleX="-1"/>
+                    </Image.RenderTransform>
+                </Image>
+            </Grid>
+        </Grid>
     </Grid>
 </Page>

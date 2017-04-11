@@ -57,9 +57,22 @@ namespace TVSRenamer
                     SearchResult sr = new SearchResult();
                     sr.Height = 30;
                     sr.MainText.Text = show.name;
+                    sr.Details.MouseLeftButtonUp += (se, e) => ShowDetails(show);
+                    sr.Selected.MouseLeftButtonUp += (se, e) => NextPage(show);
                     panel.Children.Add(sr);
                 }), DispatcherPriority.Send);
             }
+        }
+        private void ShowDetails(Show s) {
+            Page p = new Details(s);
+            Window main = Window.GetWindow(this);
+            ((MainWindow)main).AddTempFrame(p);
+        }
+
+        private void NextPage(Show s) {
+            Page p = new Locations(s);
+            Window main = Window.GetWindow(this);
+            ((MainWindow)main).SetFrame(p);
         }
 
     }
