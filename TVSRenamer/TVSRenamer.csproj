@@ -66,6 +66,9 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Classes\DownloadFromApi.cs" />
+    <Compile Include="Pages\Locations.xaml.cs">
+      <DependentUpon>Locations.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Pages\SelectShow.xaml.cs">
       <DependentUpon>SelectShow.xaml</DependentUpon>
     </Compile>
@@ -75,6 +78,10 @@
     <Compile Include="Pages\SearchResult.xaml.cs">
       <DependentUpon>SearchResult.xaml</DependentUpon>
     </Compile>
+    <Page Include="Pages\Locations.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

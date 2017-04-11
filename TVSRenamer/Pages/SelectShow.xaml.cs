@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -28,7 +29,7 @@ namespace TVSRenamer
         }
 
         private void GitHub_MouseLeftButtonUp(object sender, MouseButtonEventArgs e) {
-            API.getShows("Game of Thrones");
+            Process.Start("https://github.com/Kaharonus/TVS-Renamer");   
         }
 
         private void Info_MouseLeftButtonUp(object sender, MouseButtonEventArgs e) {

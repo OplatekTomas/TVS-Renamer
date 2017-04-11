@@ -14,7 +14,12 @@ namespace TVSRenamer {
             List<Show> list = new List<Show>();
             name = name.Replace(" ", "+");
             WebRequest wr = WebRequest.Create("http://api.tvmaze.com/search/shows?q=" + name);
-            HttpWebResponse response = (HttpWebResponse)wr.GetResponse();
+             HttpWebResponse response = null;
+            try {
+                response = (HttpWebResponse)wr.GetResponse();
+            } catch (Exception) {
+                return list;
+            }
             Stream dataStream = response.GetResponseStream();
             StreamReader reader = new StreamReader(dataStream);
             string responseFromServer = reader.ReadToEnd();
