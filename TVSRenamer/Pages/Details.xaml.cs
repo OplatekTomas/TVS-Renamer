@@ -45,7 +45,7 @@ namespace TVSRenamer {
         }
 
         private string RemoveStyle(string line) {
-            string[] separator = { "</?p>", "</?em>", "</?strong>", "</?b>", "</?i>" };
+            string[] separator = { "</?p>", "</?em>", "</?strong>", "</?b>", "</?i>", "</?span>" };
             string text = line;
             for (int i = 0; i < separator.Length; i++) {
                 Regex reg = new Regex(separator[i]);

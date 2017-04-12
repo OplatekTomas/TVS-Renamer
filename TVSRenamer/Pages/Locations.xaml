@@ -6,7 +6,14 @@
       xmlns:local="clr-namespace:TVSRenamer"
       mc:Ignorable="d" d:DesignWidth="1024" d:DesignHeight="576"
       Title="Locations" >
-
+    <Page.Resources>
+        <Storyboard x:Key="ShowBottom" >
+            <ThicknessAnimation Storyboard.TargetProperty="Margin" From="0,0,0,-53" To="0,0,0,-3" DecelerationRatio=".5" Duration="0:0:0.25" />
+        </Storyboard>
+        <Storyboard x:Key="HideBottom">
+            <ThicknessAnimation Storyboard.TargetProperty="Margin" From="0,0,0,-3" To="0,0,0,-53" AccelerationRatio=".5" Duration="0:0:0.15" />
+        </Storyboard>
+    </Page.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="30px"/>
@@ -71,6 +78,11 @@
                     </Image.RenderTransform>
                 </Image>
             </Grid>
+        </Grid>
+        <Grid x:Name="Waiting" VerticalAlignment="Bottom" Margin="0,-53"  Grid.RowSpan="2" Height="53" Width="200">
+            <Border Background="#B71C1C" CornerRadius="3">
+                <TextBlock FontSize="20" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="White">Working</TextBlock>
+            </Border>
         </Grid>
     </Grid>
 </Page>

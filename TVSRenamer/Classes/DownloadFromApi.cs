@@ -125,8 +125,7 @@ namespace TVSRenamer {
         }
         public static List<Episode> RequestEpisodes(Show s) {
             List<Episode> list = new List<Episode>();
-            string name = s.name.Replace(" ", "+");
-            WebRequest wr = WebRequest.Create("http://api.tvmaze.com/search/shows?q=" + name);
+            WebRequest wr = WebRequest.Create("http://api.tvmaze.com/shows/"+ s.id+"/episodes");
             HttpWebResponse response = null;
             try {
                 response = (HttpWebResponse)wr.GetResponse();
@@ -140,7 +139,7 @@ namespace TVSRenamer {
             foreach (JToken jt in jo) {
                 Episode e = new Episode();
                 e.season = Int32.Parse(jt["season"].ToString());
-                e.episode = Int32.Parse(jt["episode"].ToString());
+                e.episode = Int32.Parse(jt["number"].ToString());
                 e.name = jt["name"].ToString();
                 list.Add(e);
             }

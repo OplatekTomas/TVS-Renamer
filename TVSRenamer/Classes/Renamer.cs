@@ -10,6 +10,11 @@ using System.Windows;
 namespace TVSRenamer {
     class Renamer {
         public static void RenameBatch(List<string> locations, string finalLoc , Show show) {
+            show.aliases.AddRange(API.GetAliases(show));
+            locations.Insert(0, finalLoc);
+            if (!show.name.Equals(Path.GetDirectoryName(finalLoc), StringComparison.InvariantCultureIgnoreCase)) {
+                finalLoc += "\\" + show.name;
+            }
             List<string> files = ScanEpisodes(locations, show);
             RenameFiles(files, finalLoc,show);
         }
@@ -60,7 +65,9 @@ namespace TVSRenamer {
             List<string> showFiles = new List<string>();
             List<string> files = new List<string>();
             foreach (string location in locations) {
-                files.AddRange(Directory.GetFiles(location, "*.*", System.IO.SearchOption.AllDirectories));
+                if (Directory.Exists(location)) { 
+                    files.AddRange(Directory.GetFiles(location, "*.*", System.IO.SearchOption.AllDirectories));
+                }
             }
             foreach (string file in files) {
                 foreach (string alias in s.aliases) {
@@ -109,7 +116,7 @@ namespace TVSRenamer {
                 } else {
                     string output = GetValidName(path, GetName(show.name, selectedEP.season, selectedEP.episode, selectedEP.name), Path.GetExtension(file), file);
                     if (file != output) {
-                        File.Move(file, output);
+                        File.Move(file, output);                      
                     }
                 }
             }

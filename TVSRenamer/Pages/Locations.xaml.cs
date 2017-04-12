@@ -16,6 +16,7 @@ using System.Windows.Shapes;
 using Ookii.Dialogs.Wpf;
 using System.Windows.Forms;
 using System.IO;
+using System.Windows.Threading;
 
 namespace TVSRenamer {
     /// <summary>
@@ -49,18 +50,24 @@ namespace TVSRenamer {
         }
 
         private void StartButton_MouseUp(object sender, MouseButtonEventArgs e) {
+            ShowWaiting();
+            string text = TextBox.Text;
             if (CheckFolders()) {
                 List<string> l = new List<string>();
                 l.Add(Loc1.Text);
                 l.Add(Loc2.Text);
                 l.Add(Loc3.Text);
-                show.aliases.AddRange(API.GetAliases(show));
-                Renamer.RenameBatch(l, TextBox.Text, show);
+                Action a = null;
+                a = () => Renamer.RenameBatch(l, text, show);                            
+                IAsyncResult ar = a.BeginInvoke(Callback, null);               
             } else {
                 System.Windows.MessageBox.Show("One of the paths you entered doesn't exist");
+                HideWaiting();
             }
         }
-
+        public void Callback(IAsyncResult result) {
+            System.Windows.Application.Current.Dispatcher.Invoke(new Action(() => HideWaiting()));
+        }
         private bool CheckFolders() {
             bool check1 = false;
             bool check2 = false;
@@ -119,5 +126,18 @@ namespace TVSRenamer {
                 Loc3.Text = vfbd.SelectedPath;
             }
         }
+        private void ShowWaiting() { 
+            ShowHideMenu("ShowBottom", Waiting);
+        }
+
+        private void HideWaiting() {
+            ShowHideMenu("HideBottom", Waiting);
+        }
+
+        private void ShowHideMenu(string Storyboard, Grid pnl) {
+            System.Windows.Media.Animation.Storyboard sb = Resources[Storyboard] as System.Windows.Media.Animation.Storyboard;
+            sb.Begin(pnl);
+        }
+
     }
 }
