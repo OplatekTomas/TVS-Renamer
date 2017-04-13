@@ -13,20 +13,22 @@ namespace TVSRenamer {
         public static void RenameBatch(List<string> locations, string finalLoc , Show show) {
             show.aliases.AddRange(API.GetAliases(show));
             locations.Insert(0, finalLoc);
-            if (!show.name.Equals(Path.GetDirectoryName(finalLoc), StringComparison.InvariantCultureIgnoreCase)) {
+            if (!show.name.Equals(Path.GetFileName(finalLoc), StringComparison.InvariantCultureIgnoreCase)) {
                 finalLoc += "\\" + show.name;
             }
             List<string> files = ScanEpisodes(locations, show);
             List<Episode> EPNames = API.RequestEpisodes(show);
             foreach (string file in files) {
                 Tuple<int, int> t = GetInfo(file);
-                int season = t.Item1;
-                int episode = t.Item2;
-                Episode selectedEP = EPNames.FirstOrDefault(o => o.season == season && o.episode == episode);
-                int index = EPNames.FindIndex(o => o.season == season && o.episode == episode);
-                if (selectedEP == null) {
-                } else {
-                    RenameFiles(file, finalLoc, show, selectedEP, index);
+                if (t != null) { 
+                    int season = t.Item1;
+                    int episode = t.Item2;
+                    Episode selectedEP = EPNames.FirstOrDefault(o => o.season == season && o.episode == episode);
+                    int index = EPNames.FindIndex(o => o.season == season && o.episode == episode);
+                    if (selectedEP == null) {
+                    } else {
+                        RenameFiles(file, finalLoc, show, selectedEP, index);
+                    }
                 }
             }
         }
@@ -126,8 +128,9 @@ namespace TVSRenamer {
                         File.Move(file, output);
                         DeleteFiles(file);
                         moved = true;
-                     } catch (Exception) {
+                     } catch (Exception e) {
                         DialogResult dialogResult = System.Windows.Forms.MessageBox.Show("File " + file + " couldn't be renamed.\nClose apps that might be using it.\n\nTry again?", "Error", MessageBoxButtons.YesNo);
+                        System.Windows.Forms.MessageBox.Show(e.Message);
                         if (dialogResult == DialogResult.No) {
                             moved = true;
                         }
@@ -136,11 +139,17 @@ namespace TVSRenamer {
             }                            
         }
         public static void DeleteFiles(string file) {
-            long size = GetDirectorySize(Path.GetDirectoryName(file));
+            string dirname = Path.GetDirectoryName(file);
+            List<string> files = FilterExtensions(Directory.GetFiles(dirname, "*", SearchOption.AllDirectories).ToList());
+            long size = GetDirectorySize(dirname);          
             if (Properties.Settings.Default.Delete && size < Properties.Settings.Default.maxSize*1000000) {
-                Directory.Delete(Path.GetDirectoryName(file));
+                if (files.Count == 0) { 
+                    Directory.Delete(dirname,true);
+                }
                 //MessageBox.Show("Deleted");
             }
         }
+
+
     }
 }

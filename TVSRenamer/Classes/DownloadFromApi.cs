@@ -71,20 +71,32 @@ namespace TVSRenamer {
                     string data = "{\"apikey\": \"0E73922C4887576A\",\"username\": \"Kaharonus\",\"userkey\": \"28E2687478CA3B16\"}";
                     streamWriter.Write(data);
                 }
-            } catch (WebException) { MessageBox.Show("Connection error"); }
+            } catch (WebException) { MessageBox.Show("Connection error"); return null; }
             string text;
-            var response = request.GetResponse();
-            using (var sr = new StreamReader(response.GetResponseStream())) {
-                text = sr.ReadToEnd();
-                text = text.Remove(text.IndexOf("\"token\""), "\"token\"".Length);
-                text = text.Split('\"', '\"')[1];
-                return text;
+            try {
+                var response = request.GetResponse();
+                using (var sr = new StreamReader(response.GetResponseStream())) {
+                    text = sr.ReadToEnd();
+                    text = text.Remove(text.IndexOf("\"token\""), "\"token\"".Length);
+                    text = text.Split('\"', '\"')[1];
+                    return text;
+                }
+            } catch (Exception e) {
+                MessageBox.Show("Connection error!\n"+ e.Message); return null;
             }
         }
         public static List<string> GetAliases(Show s) {
             List<string> aliases = new List<string>();
             Regex reg = new Regex(@"\([0-9]{4}\)");
+            Regex reg2 = new Regex(@"\.");
             aliases.Add(s.name);
+            string temp = s.name;
+            Match m = reg2.Match(temp);
+            while (m.Success) {
+                temp = temp.Remove(m.Index, 1);
+                aliases.Add(s.name.Remove(m.Index, 1));
+                m = reg2.Match(temp);
+            }
             Match snMatch = reg.Match(s.name);
             if (snMatch.Success) {
                 aliases.Add(reg.Replace(s.name, ""));
