@@ -75,6 +75,10 @@ namespace TVSRenamer {
         }
         private bool CheckFolders() {
             if (Directory.Exists(TextBox.Text) && (Directory.Exists(Loc1.Text) || Loc1.Text == "") && (Directory.Exists(Loc2.Text) || Loc2.Text == "") && (Directory.Exists(Loc3.Text) || Loc3.Text == "")) {
+                Properties.Settings.Default.Lokace1 = Loc1.Text;
+                Properties.Settings.Default.Lokace2 = Loc2.Text;
+                Properties.Settings.Default.Lokace3 = Loc3.Text;
+                Properties.Settings.Default.Save();
                 return true;
             } else { return false; }           
         }

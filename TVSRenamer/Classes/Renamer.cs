@@ -48,12 +48,10 @@ namespace TVSRenamer {
             return null;
         }
 
-        public static string GetValidName(string path, string name, string extension, string original) {
+        public static string GetValidName(string path, string name, string extension, string original,int s) {
             int filenumber = 1;
             string final;
             string invalid = new string(Path.GetInvalidFileNameChars()) + new string(Path.GetInvalidPathChars());
-            Match m = new Regex("s[0-5][0-9]", RegexOptions.IgnoreCase).Match(name);
-            int s = Int32.Parse(m.Value.Remove(0, 1));
             foreach (char c in invalid) {
                 name = name.Replace(c.ToString(), "");
             }
@@ -91,10 +89,11 @@ namespace TVSRenamer {
             return FilterExtensions(showFiles);
         }
         public static Tuple<int, int> GetInfo(string file) {
+            file = Path.GetFileName(file);
             Match season = new Regex("[s][0-5][0-9]", RegexOptions.IgnoreCase).Match(file);
             Match episode = new Regex("[e][0-5][0-9]", RegexOptions.IgnoreCase).Match(file);
             Match special = new Regex("[0-5][0-9][x][0-5][0-9]", RegexOptions.IgnoreCase).Match(file);
-            if (season.Success && episode.Success) {
+            if (season.Success && episode.Success && (episode.Index-season.Index) < 5) {
                 int s = Int32.Parse(season.Value.Remove(0, 1));
                 int e = Int32.Parse(episode.Value.Remove(0, 1));
                 return new Tuple<int, int>(s, e);
@@ -119,7 +118,7 @@ namespace TVSRenamer {
             return new DirectoryInfo(parentDirectory).GetFiles("*.*", SearchOption.AllDirectories).Sum(file => file.Length);
         }
         public static void RenameFiles(string file, string path, Show show,Episode epi,int index) {          
-            string output = GetValidName(path, GetName(show.name, epi.season, epi.episode, epi.name), Path.GetExtension(file), file);
+            string output = GetValidName(path, GetName(show.name, epi.season, epi.episode, epi.name), Path.GetExtension(file), file,epi.season);
             if (file != output) {
                 bool moved = false;
                 do {
