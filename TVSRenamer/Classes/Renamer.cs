@@ -6,6 +6,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Forms;
 
 namespace TVSRenamer {
     class Renamer {
@@ -16,7 +17,18 @@ namespace TVSRenamer {
                 finalLoc += "\\" + show.name;
             }
             List<string> files = ScanEpisodes(locations, show);
-            RenameFiles(files, finalLoc,show);
+            List<Episode> EPNames = API.RequestEpisodes(show);
+            foreach (string file in files) {
+                Tuple<int, int> t = GetInfo(file);
+                int season = t.Item1;
+                int episode = t.Item2;
+                Episode selectedEP = EPNames.FirstOrDefault(o => o.season == season && o.episode == episode);
+                int index = EPNames.FindIndex(o => o.season == season && o.episode == episode);
+                if (selectedEP == null) {
+                } else {
+                    RenameFiles(file, finalLoc, show, selectedEP, index);
+                }
+            }
         }
         public static string GetName(string showName, int season, int episode, string epName) {
             if (season < 10) {
@@ -103,22 +115,32 @@ namespace TVSRenamer {
             }
             return filtered;
         }
-        public static void RenameFiles(List<string> files, string path, Show show) {
-            List<Episode> EPNames = API.RequestEpisodes(show);
-            foreach (string file in files) {
-                Tuple<int, int> t = GetInfo(file);
-                int season = t.Item1;
-                int episode = t.Item2;
-                var selectedEP = EPNames.FirstOrDefault(o => o.season == season && o.episode == episode);
-                int index = EPNames.FindIndex(o => o.season == season && o.episode == episode);
-                if (selectedEP == null) {
-                    MessageBox.Show("This TV Show doesnt have episode " + episode + " in season " + season + ".\nFile " + file + " won't be renamed", "Error");
-                } else {
-                    string output = GetValidName(path, GetName(show.name, selectedEP.season, selectedEP.episode, selectedEP.name), Path.GetExtension(file), file);
-                    if (file != output) {
-                        File.Move(file, output);                      
+        public static long GetDirectorySize(string parentDirectory) {
+            return new DirectoryInfo(parentDirectory).GetFiles("*.*", SearchOption.AllDirectories).Sum(file => file.Length);
+        }
+        public static void RenameFiles(string file, string path, Show show,Episode epi,int index) {          
+            string output = GetValidName(path, GetName(show.name, epi.season, epi.episode, epi.name), Path.GetExtension(file), file);
+            if (file != output) {
+                bool moved = false;
+                do {
+                    try {
+                        File.Move(file, output);
+                        DeleteFiles(file);
+                        moved = true;
+                     } catch (Exception) {
+                        DialogResult dialogResult = System.Windows.Forms.MessageBox.Show("File " + file + " couldn't be renamed.\nClose apps that might be using it.\n\nTry again?", "Error", MessageBoxButtons.YesNo);
+                        if (dialogResult == DialogResult.No) {
+                            moved = true;
+                        }
                     }
-                }
+                } while (moved != true);
+            }                            
+        }
+        public static void DeleteFiles(string file) {
+            long size = GetDirectorySize(Path.GetDirectoryName(file));
+            if (Properties.Settings.Default.Delete && size < Properties.Settings.Default.maxSize*1000000) {
+                Directory.Delete(Path.GetDirectoryName(file));
+                //MessageBox.Show("Deleted");
             }
         }
     }

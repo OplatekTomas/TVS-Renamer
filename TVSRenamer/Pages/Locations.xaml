@@ -59,12 +59,12 @@
                     <TextBlock Foreground="White" Text="Select" HorizontalAlignment="Center" FontSize="14" />
                 </Border>
             </Grid>
-            <CheckBox x:Name="checkDelete" HorizontalAlignment="Left" Margin="10,220,0,0" VerticalAlignment="Top" FontSize="16" Foreground="White" Width="380" >
+            <CheckBox x:Name="checkDelete" HorizontalAlignment="Left" Margin="10,220,0,0" VerticalAlignment="Top" FontSize="16" Foreground="White" Width="380" Click="checkDelete_Click">
                 <TextBlock Margin="0,-3">
                    Delete folder after moving file if it's is smaller then
                 </TextBlock>
             </CheckBox>
-            <TextBox Background="#333333" x:Name="FolderSizeBox" BorderThickness="0" Margin="395,215,0,0" HorizontalAlignment="Left" Width="45" Height="25" VerticalAlignment="Top" Foreground="White" FontSize="16"></TextBox>
+            <TextBox Background="#333333" x:Name="FolderSizeBox" BorderThickness="0" Margin="395,215,0,0" HorizontalAlignment="Left" Width="45" Height="25" VerticalAlignment="Top" Foreground="White" FontSize="16" TextChanged="FolderSizeBox_TextChanged"></TextBox>
             <TextBlock Text="MB" HorizontalAlignment="Left" Margin="450,217,0,0" VerticalAlignment="Top" FontSize="16" Foreground="White"/>
             <Grid x:Name="StartButton" Height="45" Width="45" Grid.Row="1" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="20,15" MouseUp="StartButton_MouseUp">
                 <Ellipse Fill="#B71C1C">

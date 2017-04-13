@@ -13,7 +13,8 @@
             <RowDefinition Height="1*"/>
         </Grid.RowDefinitions>
         <Grid Background="#E53935">
-            <TextBox Background="#B71C1C" x:Name="TextBox" BorderThickness="0" Margin="10,3,250,3" Foreground="White" FontSize="16" TextChanged="TextBox_TextChanged"> 
+            <TextBox Background="#B71C1C" x:Name="TextBox" BorderThickness="0" Margin="10,3,250,3" Foreground="#E53935" FontSize="16" TextChanged="TextBox_TextChanged" GotFocus="TextBox_GotFocus">
+                Search TV Show
             </TextBox>
             <Grid Margin="3" x:Name="Info" HorizontalAlignment="Right" MouseLeftButtonUp="Info_MouseLeftButtonUp">
                 <Image Source="../Icons/info.png"></Image>

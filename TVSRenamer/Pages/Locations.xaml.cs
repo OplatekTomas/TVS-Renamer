@@ -17,6 +17,7 @@ using Ookii.Dialogs.Wpf;
 using System.Windows.Forms;
 using System.IO;
 using System.Windows.Threading;
+using System.Text.RegularExpressions;
 
 namespace TVSRenamer {
     /// <summary>
@@ -33,7 +34,9 @@ namespace TVSRenamer {
         }
 
         private void Info_MouseLeftButtonUp(object sender, MouseButtonEventArgs e) {
-
+            Page p = new Info();
+            Window main = Window.GetWindow(this);
+            ((MainWindow)main).AddTempFrame(p);
         }
 
         private void Back_MouseLeftButtonUp(object sender, MouseButtonEventArgs e) {
@@ -47,6 +50,8 @@ namespace TVSRenamer {
             Loc1.Text = Properties.Settings.Default.Lokace1;
             Loc2.Text = Properties.Settings.Default.Lokace2;
             Loc3.Text = Properties.Settings.Default.Lokace3;
+            FolderSizeBox.Text = Properties.Settings.Default.maxSize.ToString();
+            checkDelete.IsChecked = Properties.Settings.Default.Delete;
         }
 
         private void StartButton_MouseUp(object sender, MouseButtonEventArgs e) {
@@ -69,32 +74,9 @@ namespace TVSRenamer {
             System.Windows.Application.Current.Dispatcher.Invoke(new Action(() => HideWaiting()));
         }
         private bool CheckFolders() {
-            bool check1 = false;
-            bool check2 = false;
-            bool check3 = false;
-            bool check4 = false;
-            if (Directory.Exists(TextBox.Text)) {
-                check1 = true;
-            }
-            if (Directory.Exists(Loc1.Text) || Loc1.Text == "") {
-                check2 = true;                
-            }
-            if (Directory.Exists(Loc2.Text) || Loc2.Text == "") {
-                check3 = true;
-            }
-            if (Directory.Exists(Loc3.Text) || Loc3.Text == "") {
-                check4 = true;
-            }
-            if (check1 && check2 && check3 && check4) {
-                Properties.Settings.Default.Lokace1 = Loc1.Text;
-                Properties.Settings.Default.Lokace2 = Loc2.Text;
-                Properties.Settings.Default.Lokace3 = Loc3.Text;
-                Properties.Settings.Default.Save();
+            if (Directory.Exists(TextBox.Text) && (Directory.Exists(Loc1.Text) || Loc1.Text == "") && (Directory.Exists(Loc2.Text) || Loc2.Text == "") && (Directory.Exists(Loc3.Text) || Loc3.Text == "")) {
                 return true;
-            } else {
-                return false;
-            }
-
+            } else { return false; }           
         }
 
         private void SelectLocation_MouseUp(object sender, MouseButtonEventArgs e) {
@@ -126,11 +108,13 @@ namespace TVSRenamer {
                 Loc3.Text = vfbd.SelectedPath;
             }
         }
-        private void ShowWaiting() { 
+        private void ShowWaiting() {
+            StartButton.MouseUp -= StartButton_MouseUp;
             ShowHideMenu("ShowBottom", Waiting);
         }
 
         private void HideWaiting() {
+            StartButton.MouseUp += StartButton_MouseUp;
             ShowHideMenu("HideBottom", Waiting);
         }
 
@@ -139,5 +123,30 @@ namespace TVSRenamer {
             sb.Begin(pnl);
         }
 
+        private void checkDelete_Click(object sender, RoutedEventArgs e) {
+            if (checkDelete.IsChecked == true) {
+                FolderSizeBox.IsEnabled = true;
+                Properties.Settings.Default.Delete = true;
+                Properties.Settings.Default.Save();
+            } else {
+                FolderSizeBox.IsEnabled = false;
+                Properties.Settings.Default.Delete = false;
+                Properties.Settings.Default.Save();
+            }
+        }
+
+        private void FolderSizeBox_TextChanged(object sender, TextChangedEventArgs e) {
+            string pattern = @"^([1-9][0-9]{0,1}(\.[\d]{1,2})?|100)$";
+            if (Regex.IsMatch(FolderSizeBox.Text, pattern)) {
+                Properties.Settings.Default.maxSize = Int32.Parse(FolderSizeBox.Text);
+                Properties.Settings.Default.Save();
+            } else if (FolderSizeBox.Text != "") {
+                Properties.Settings.Default.maxSize = 1;
+                Properties.Settings.Default.Save();
+            } else {
+                System.Windows.MessageBox.Show("Enter numbers between 1-100");
+            }
+
+        }
     }
 }

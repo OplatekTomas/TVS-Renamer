@@ -33,7 +33,9 @@ namespace TVSRenamer
         }
 
         private void Info_MouseLeftButtonUp(object sender, MouseButtonEventArgs e) {
-
+            Page p = new Info();
+            Window main = Window.GetWindow(this);
+            ((MainWindow)main).AddTempFrame(p);
         }
 
         private void TextBox_TextChanged(object sender, TextChangedEventArgs e) {
@@ -75,5 +77,10 @@ namespace TVSRenamer
             ((MainWindow)main).SetFrame(p);
         }
 
+        private void TextBox_GotFocus(object sender, RoutedEventArgs e) {
+            TextBox.Text = "";
+            TextBox.Foreground = new SolidColorBrush(Colors.White);
+            TextBox.GotFocus -= TextBox_GotFocus;
+        }
     }
 }
