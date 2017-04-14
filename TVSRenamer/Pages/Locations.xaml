@@ -61,7 +61,7 @@
             </Grid>
             <CheckBox x:Name="checkDelete" HorizontalAlignment="Left" Margin="10,220,0,0" VerticalAlignment="Top" FontSize="16" Foreground="White" Width="380" Click="checkDelete_Click">
                 <TextBlock Margin="0,-3">
-                   Delete folder after moving file if it's is smaller then
+                   Delete folder after moving file if it's is smaller than
                 </TextBlock>
             </CheckBox>
             <TextBox Background="#333333" x:Name="FolderSizeBox" BorderThickness="0" Margin="395,215,0,0" HorizontalAlignment="Left" Width="45" Height="25" VerticalAlignment="Top" Foreground="White" FontSize="16" TextChanged="FolderSizeBox_TextChanged"></TextBox>
