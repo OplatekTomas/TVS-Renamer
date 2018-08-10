@@ -1,4 +1,4 @@
-TVS-Renamer
+TVS-Renamer (deprecated)
 ======
 
 TVS-Renamer is a simple C# written app (UI made with WPF) that renames episodes of almost every TV show to format:
@@ -12,7 +12,7 @@ Futurama - S01E01 - Space Pilot 3000
 Created by Tomáš Oplatek (c) 2017
 
 ## Changelog:
-### Current Version: V2.0 (13.04.2016)
+### Current Version: V2.0 (13.04.2017)
 - Major UI improvement
 - Code speed up
 - Stability improvements
