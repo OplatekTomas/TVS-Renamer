@@ -5,7 +5,7 @@ use reqwest::Error;
 use crate::args::args_parser::Mode;
 use crate::database::Database;
 use structopt::StructOpt;
-use crate::api::search::ShowResult;
+use crate::api::show::ShowResult;
 use crate::api::tv_maze;
 use crate::tv_maze::TVMaze;
 use std::path::{Path, PathBuf};
@@ -73,14 +73,22 @@ fn main() {
         None => return
     };
     match mode {
-        Mode::AddShow { name, path } => {
-            let show = match TVMaze::search(&name) {
+        Mode::AddShow { name, path , risky} => {
+            let show = match TVMaze::search(&name, risky) {
                 Ok(value) => value,
                 Err(err) => {
                     println!("{}", err.to_string());
                     return;
                 }
             };
+            let episodes = match TVMaze::get_episodes(show.id) {
+                Ok(value) => value,
+                Err(err) => {
+                    println!("{}", err.to_string());
+                    return;
+                }
+            };
+            dbg!(episodes);
         }
         Mode::Init {} => {
             println!("{}", Red.paint("You just tried to initialize already initialized app..."));

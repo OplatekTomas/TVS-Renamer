@@ -28,7 +28,9 @@ pub enum Mode {
         #[structopt(short, long)]
         name: String,
         #[structopt(short, long)]
-        path: Option<PathBuf>
+        path: Option<PathBuf>,
+        #[structopt(short, long,parse(try_from_str) ,default_value = "false")]
+        risky: bool
     },
     RemoveShow{
         #[structopt(short, long)]

@@ -1,2 +1,3 @@
 pub mod tv_maze;
-pub mod search;
+pub mod show;
+pub mod episode;
