@@ -4,9 +4,11 @@ use std::str::FromStr;
 use structopt::StructOpt;
 
 /// Program to make sense of library of TV shows...
-#[derive(StructOpt, Debug)]
+#[derive(StructOpt, Debug, PartialEq)]
 #[structopt()]
 pub enum Mode {
+    Init{
+    },
     RenameShow{
         #[structopt(short, long)]
         id: i32
