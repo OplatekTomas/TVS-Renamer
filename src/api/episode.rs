@@ -10,8 +10,8 @@ pub struct EpisodeResult {
     pub id: i64,
     pub url: String,
     pub name: String,
-    pub season: i64,
-    pub number: Option<i64>,
+    pub season: i32,
+    pub number: Option<i32>,
     #[serde(rename = "type")]
     pub episode_type: String,
 }

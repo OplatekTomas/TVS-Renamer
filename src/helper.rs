@@ -1,6 +1,5 @@
 use std::io;
 use std::io::Write;
-use std::num::ParseIntError;
 use ansi_term::Colour::Red;
 
 

@@ -14,12 +14,6 @@ pub enum Mode {
         id: i32
     },
     RenameAllShows,
-    SetLibrary{
-        #[structopt(short, long)]
-        id: i32,
-        #[structopt(short, long)]
-        scan: Option<bool>
-    },
     AddScanDirectory{
         #[structopt(short, long)]
         path: PathBuf

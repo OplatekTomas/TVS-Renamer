@@ -1,20 +1,121 @@
 use std::io;
-use std::io::Read;
 use ansi_term::Colour::{Green, Red};
-use reqwest::Error;
 use crate::args::args_parser::Mode;
-use crate::database::Database;
+
 use structopt::StructOpt;
 use crate::api::show::ShowResult;
 use crate::api::tv_maze;
 use crate::tv_maze::TVMaze;
 use std::path::{Path, PathBuf};
+use ansi_term::Style;
+use walkdir::WalkDir;
+use crate::database::database::Database;
+use crate::database::models::{Episode, Show};
+use crate::logger::Logger;
+use crate::renamer::Renamer;
 
 mod args;
 mod database;
 mod api;
 mod helper;
+mod renamer;
+mod logger;
 
+
+
+fn main() {
+    let (mode, mut db) = match init() {
+        Some((mode, db)) => (mode, db),
+        None => return
+    };
+    match mode {
+        Mode::AddShow { name, path, risky } => add_show(&mut db, &name, path, risky),
+        Mode::ListShows => list_shows(&mut db),
+        Mode::AddScanDirectory { path } => add_scan_directory(&mut db, path),
+        Mode::ListScanDirectories => list_scan_directories(&mut db),
+        Mode::RemoveShow { id } => remove_show(&mut db, id as i64),
+        Mode::RenameShow { id } => rename_show(db, id as i64),
+        Mode::RenameAllShows => rename_all_shows(db),
+        Mode::Init {} => {
+            println!("{}", Red.paint("You just tried to initialize already initialized app..."));
+        }
+    }
+}
+
+fn rename_show(db: Database, id: i64) {
+    let mut renamer = Renamer::new(&db);
+    renamer.rename_show(id);
+}
+
+fn rename_all_shows(db: Database) {
+    let mut renamer = Renamer::new(&db);
+    renamer.rename_all_shows();
+}
+
+fn remove_show(db: &mut Database, id: i64) {
+    let show = db.get_show(id);
+    if let Some(show) = show {
+        println!("{}", Green.paint(format!("Removed show: {}", show.name)));
+        db.remove_show(id);
+        db.save();
+    } else {
+        println!("{}", Red.paint(format!("Show with id {} not found", id)));
+    }
+}
+
+fn list_scan_directories(db: &mut Database) {
+    println!("{}", Green.paint("Scan directories:"));
+    for dir in db.scan_dirs.iter() {
+        println!("{}", dir.to_str().unwrap());
+    }
+}
+
+fn add_scan_directory(db: &mut Database, path: PathBuf) {
+    if db.scan_dirs.contains(&path) {
+        println!("{}", Red.paint("Directory already added."));
+        return;
+    }
+    if path.exists() {
+        db.scan_dirs.push(path);
+        db.save();
+        println!("{}", Green.paint("Directory added to scan list."));
+    } else {
+        println!("{}", Red.paint("Directory does not exist."));
+    }
+}
+
+fn list_shows(db: &mut Database) {
+    println!("{}", Green.paint("All shows in the library:"));
+    for show in &db.shows {
+        println!("{} (id: {}): \"{}\"", Style::new().bold().paint(&show.name), show.id, show.path.to_str().unwrap());
+    }
+}
+
+fn add_show(db: &mut Database, name: &String, path: Option<PathBuf>, risky: bool) {
+    let show = match TVMaze::search(&name, risky) {
+        Ok(value) => value,
+        Err(err) => {
+            println!("{}", err.to_string());
+            return;
+        }
+    };
+    if db.shows.iter().any(|x| x.id == show.id) {
+        println!("{}", Red.paint("Show already exists in database."));
+        return;
+    }
+    let episodes = match TVMaze::get_episodes(show.id) {
+        Ok(value) => value,
+        Err(err) => {
+            println!("{}", err.to_string());
+            return;
+        }
+    };
+    let mut show = Show::from(&show);
+    show.episodes = episodes.iter().map(Episode::from).collect();
+    db.add_show(show, path);
+    println!("\n{}", Green.paint("Show added to library."));
+    db.save();
+}
 
 fn read_path() -> PathBuf {
     let mut path = String::new();
@@ -66,33 +167,3 @@ fn init() -> Option<(Mode, Database)> {
     return None;
 }
 
-
-fn main() {
-    let (mode, db) = match init() {
-        Some((mode, db)) => (mode, db),
-        None => return
-    };
-    match mode {
-        Mode::AddShow { name, path , risky} => {
-            let show = match TVMaze::search(&name, risky) {
-                Ok(value) => value,
-                Err(err) => {
-                    println!("{}", err.to_string());
-                    return;
-                }
-            };
-            let episodes = match TVMaze::get_episodes(show.id) {
-                Ok(value) => value,
-                Err(err) => {
-                    println!("{}", err.to_string());
-                    return;
-                }
-            };
-            dbg!(episodes);
-        }
-        Mode::Init {} => {
-            println!("{}", Red.paint("You just tried to initialize already initialized app..."));
-        }
-        _ => todo!(),
-    }
-}
