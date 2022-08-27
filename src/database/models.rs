@@ -1,9 +1,7 @@
-
-use std::path::PathBuf;
 use crate::database::*;
-use serde::{Deserialize, Serialize};
 use crate::ShowResult;
-
+use serde::{Deserialize, Serialize};
+use std::path::PathBuf;
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Show {
@@ -11,9 +9,8 @@ pub struct Show {
     pub name: String,
     pub path: PathBuf,
     pub episodes: Vec<Episode>,
-    pub name_pattern: Vec<String>
+    pub name_pattern: Vec<String>,
 }
-
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Episode {
@@ -24,46 +21,30 @@ pub struct Episode {
     pub is_special: bool,
 }
 
-impl Show {
-    pub fn new() -> Self{
-        Self{
-            id: 0,
-            name: "".to_string(),
-            path: Default::default(),
-            episodes: vec![],
-            name_pattern: vec![]
-        }
-    }
-
-    pub fn from(show: &ShowResult) -> Self{
-        Self{
+impl From<ShowResult> for Show {
+    fn from(show: ShowResult) -> Self {
+        Self {
             id: show.id,
             episodes: Vec::new(),
             path: Default::default(),
             name: show.name.clone(),
-            name_pattern: show.name.split_whitespace().map(|x| x.to_lowercase()).collect()
+            name_pattern: show
+                .name
+                .split_whitespace()
+                .map(|x| x.to_lowercase())
+                .collect(),
         }
     }
-
 }
 
-impl Episode{
-    pub fn new() -> Self{
-        Self{
-            id: 0,
-            name: "".to_string(),
-            season: 0,
-            episode: 0,
-            is_special: false
-        }
-    }
-    pub fn from(episode: &EpisodeResult) -> Self{
-        Self{
+impl From<EpisodeResult> for Episode {
+    fn from(episode: EpisodeResult) -> Self {
+        Self {
             id: episode.id,
             name: episode.name.clone(),
             season: episode.season,
             episode: episode.number.unwrap_or(0),
-            is_special: episode.episode_type != "regular"
+            is_special: episode.episode_type != "regular",
         }
     }
 }

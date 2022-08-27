@@ -1,10 +1,3 @@
-
 pub struct TVMaze;
 
-
-impl TVMaze {
-   
-}
-
-
-
+impl TVMaze {}

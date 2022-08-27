@@ -1,32 +1,32 @@
-use std::io;
 use ansi_term::Colour::{Green, Red};
-use crate::args::args_parser::Mode;
+use ansi_term::Style;
+
+use simplelog::ConfigBuilder;
+
+use std::fs::OpenOptions;
+use std::io;
+use std::path::{Path, PathBuf};
 
 use structopt::StructOpt;
+
 use crate::api::show::ShowResult;
 use crate::api::tv_maze;
-use crate::tv_maze::TVMaze;
-use std::path::{Path, PathBuf};
-use ansi_term::Style;
-use walkdir::WalkDir;
+use crate::args::args_parser::Mode;
 use crate::database::database::Database;
 use crate::database::models::{Episode, Show};
-use crate::logger::Logger;
 use crate::renamer::Renamer;
+use crate::tv_maze::TVMaze;
 
+mod api;
 mod args;
 mod database;
-mod api;
 mod helper;
 mod renamer;
-mod logger;
-
-
 
 fn main() {
     let (mode, mut db) = match init() {
         Some((mode, db)) => (mode, db),
-        None => return
+        None => return,
     };
     match mode {
         Mode::AddShow { name, path, risky } => add_show(&mut db, &name, path, risky),
@@ -37,7 +37,10 @@ fn main() {
         Mode::RenameShow { id } => rename_show(db, id as i64),
         Mode::RenameAllShows => rename_all_shows(db),
         Mode::Init {} => {
-            println!("{}", Red.paint("You just tried to initialize already initialized app..."));
+            println!(
+                "{}",
+                Red.paint("You just tried to initialize already initialized app...")
+            );
         }
     }
 }
@@ -87,15 +90,20 @@ fn add_scan_directory(db: &mut Database, path: PathBuf) {
 fn list_shows(db: &mut Database) {
     println!("{}", Green.paint("All shows in the library:"));
     for show in &db.shows {
-        println!("{} (id: {}): \"{}\"", Style::new().bold().paint(&show.name), show.id, show.path.to_str().unwrap());
+        println!(
+            "{} (id: {}): \"{}\"",
+            Style::new().bold().paint(&show.name),
+            show.id,
+            show.path.to_str().unwrap()
+        );
     }
 }
 
 fn add_show(db: &mut Database, name: &String, path: Option<PathBuf>, risky: bool) {
-    let show = match TVMaze::search(&name, risky) {
+    let show = match TVMaze::search(name, risky) {
         Ok(value) => value,
         Err(err) => {
-            println!("{}", err.to_string());
+            println!("{err}");
             return;
         }
     };
@@ -106,12 +114,12 @@ fn add_show(db: &mut Database, name: &String, path: Option<PathBuf>, risky: bool
     let episodes = match TVMaze::get_episodes(show.id) {
         Ok(value) => value,
         Err(err) => {
-            println!("{}", err.to_string());
+            println!("{err}");
             return;
         }
     };
-    let mut show = Show::from(&show);
-    show.episodes = episodes.iter().map(Episode::from).collect();
+    let mut show = Show::from(show);
+    show.episodes = episodes.into_iter().map(Episode::from).collect();
     db.add_show(show, path);
     println!("\n{}", Green.paint("Show added to library."));
     db.save();
@@ -132,18 +140,26 @@ fn read_path() -> PathBuf {
 }
 
 fn init() -> Option<(Mode, Database)> {
+    init_log();
+
     let mode = Mode::from_args();
     let mut db = Database::new();
     let initialized = db.load();
     if initialized {
         return Some((mode, db));
     }
-    if !matches!(mode, Mode::Init{..}) {
-        println!("{}", Red.paint("You need to perform initialization before first use."));
+    if !matches!(mode, Mode::Init { .. }) {
+        println!(
+            "{}",
+            Red.paint("You need to perform initialization before first use.")
+        );
         println!("Use {} command.", Red.paint("init"));
         return None;
     }
-    println!("{}", Green.paint("Welcome to the revived version of TVS-Renamer."));
+    println!(
+        "{}",
+        Green.paint("Welcome to the revived version of TVS-Renamer.")
+    );
     println!("The original version was a way to learn C#, well now I'm learning Rust...");
     println!("Compared to the original there is no UI, but there is a ton of extra functionality");
     println!();
@@ -159,11 +175,35 @@ fn init() -> Option<(Mode, Database)> {
         }
         println!("Select library path: ");
     }
-    println!("{}", Green.paint("You can now use the application. Have fun!"));
-    println!("{}", Red.italic().bold().paint("Also I'm not responsible for the app ruining your things."));
+    println!(
+        "{}",
+        Green.paint("You can now use the application. Have fun!")
+    );
+    println!(
+        "{}",
+        Red.italic()
+            .bold()
+            .paint("Also I'm not responsible for the app ruining your things.")
+    );
     db.initialized = true;
     db.lib_dir = path;
     db.save();
-    return None;
+
+    None
 }
 
+fn init_log() {
+    let file = OpenOptions::new()
+        .read(true)
+        .append(true)
+        .create(true)
+        .open("log.txt")
+        .unwrap();
+
+    simplelog::WriteLogger::init(
+        log::LevelFilter::Info,
+        ConfigBuilder::new().add_filter_allow_str("tvsr").build(),
+        file,
+    )
+    .unwrap()
+}
