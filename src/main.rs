@@ -1,6 +1,7 @@
 use ansi_term::Colour::{Green, Red};
 use ansi_term::Style;
 
+use log::error;
 use simplelog::ConfigBuilder;
 
 use std::fs::OpenOptions;
@@ -47,12 +48,20 @@ fn main() {
 
 fn rename_show(db: Database, id: i64) {
     let mut renamer = Renamer::new(&db);
-    renamer.rename_show(id);
+
+    if let Err(e) = renamer.rename_show(id) {
+        error!("{e}");
+        eprintln!("{}", Red.paint(format!("{e}")));
+    }
 }
 
 fn rename_all_shows(db: Database) {
     let mut renamer = Renamer::new(&db);
-    renamer.rename_all_shows();
+
+    if let Err(e) = renamer.rename_all_shows() {
+        error!("{e}");
+        eprintln!("{}", Red.paint(format!("{e}")));
+    }
 }
 
 fn remove_show(db: &mut Database, id: i64) {
