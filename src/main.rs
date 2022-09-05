@@ -1,35 +1,36 @@
-use std::io;
 use ansi_term::Colour::{Green, Red};
-use crate::args::args_parser::Mode;
+use ansi_term::Style;
+
+use log::error;
+use simplelog::ConfigBuilder;
+
+use std::fs::OpenOptions;
+use std::io;
+use std::path::{Path, PathBuf};
 
 use structopt::StructOpt;
+
 use crate::api::show::ShowResult;
-use crate::api::tv_maze;
-use crate::tv_maze::TVMaze;
-use std::path::{Path, PathBuf};
-use ansi_term::Style;
-use walkdir::WalkDir;
+use crate::args::args_parser::Mode;
 use crate::database::database::Database;
 use crate::database::models::{Episode, Show};
-use crate::logger::Logger;
 use crate::renamer::Renamer;
 
+mod api;
 mod args;
 mod database;
-mod api;
 mod helper;
 mod renamer;
-mod logger;
-
-
 
 fn main() {
     let (mode, mut db) = match init() {
         Some((mode, db)) => (mode, db),
-        None => return
+        None => return,
     };
     match mode {
-        Mode::AddShow { name, path, risky } => add_show(&mut db, &name, path, risky),
+        Mode::AddShow { name, path, risky } => {
+            add_show(&mut db, &name, path, risky);
+        }
         Mode::ListShows => list_shows(&mut db),
         Mode::AddScanDirectory { path } => add_scan_directory(&mut db, path),
         Mode::ListScanDirectories => list_scan_directories(&mut db),
@@ -37,19 +38,30 @@ fn main() {
         Mode::RenameShow { id } => rename_show(db, id as i64),
         Mode::RenameAllShows => rename_all_shows(db),
         Mode::Init {} => {
-            println!("{}", Red.paint("You just tried to initialize already initialized app..."));
+            println!(
+                "{}",
+                Red.paint("You just tried to initialize already initialized app...")
+            );
         }
     }
 }
 
 fn rename_show(db: Database, id: i64) {
     let mut renamer = Renamer::new(&db);
-    renamer.rename_show(id);
+
+    if let Err(e) = renamer.rename_show(id) {
+        error!("{e}");
+        eprintln!("{}", Red.paint(format!("{e}")));
+    }
 }
 
 fn rename_all_shows(db: Database) {
     let mut renamer = Renamer::new(&db);
-    renamer.rename_all_shows();
+
+    if let Err(e) = renamer.rename_all_shows() {
+        error!("{e}");
+        eprintln!("{}", Red.paint(format!("{e}")));
+    }
 }
 
 fn remove_show(db: &mut Database, id: i64) {
@@ -87,34 +99,78 @@ fn add_scan_directory(db: &mut Database, path: PathBuf) {
 fn list_shows(db: &mut Database) {
     println!("{}", Green.paint("All shows in the library:"));
     for show in &db.shows {
-        println!("{} (id: {}): \"{}\"", Style::new().bold().paint(&show.name), show.id, show.path.to_str().unwrap());
+        println!(
+            "{} (id: {}): \"{}\"",
+            Style::new().bold().paint(&show.name),
+            show.id,
+            show.path.to_str().unwrap()
+        );
     }
 }
 
-fn add_show(db: &mut Database, name: &String, path: Option<PathBuf>, risky: bool) {
-    let show = match TVMaze::search(&name, risky) {
-        Ok(value) => value,
-        Err(err) => {
-            println!("{}", err.to_string());
-            return;
+fn add_show(
+    db: &mut Database,
+    name: &String,
+    path: Option<PathBuf>,
+    risky: bool,
+) -> Result<(), ureq::Error> {
+    let show = match risky {
+        true => api::find_show_by_name_risky(name)?,
+        false => {
+            let mut shows = api::find_shows_by_name(name)?;
+
+            println!(
+                "{}",
+                Green.bold().paint("The API found the following shows:")
+            );
+            for (index, show) in shows.iter().enumerate() {
+                let bold = format!(
+                    "[{}]: {}",
+                    Style::new().bold().paint(index.to_string()),
+                    Style::new().bold().paint(&show.name)
+                );
+                match show.premiered {
+                    Some(ref premiered_date) => {
+                        println!("{} ({}), {}", bold, premiered_date, show.url)
+                    }
+                    None => println!("{}, {}", bold, show.url),
+                }
+            }
+            let text = format!("Please select a show (0-{}): ", shows.len() - 1);
+            let mut index: usize;
+            loop {
+                index =
+                    helper::read_number(Some(format!("{}", Green.bold().paint(&text)))) as usize;
+                if index < shows.len() {
+                    break;
+                }
+                println!("{}", Red.paint("value not in range"));
+            }
+
+            shows.remove(index)
         }
     };
+
     if db.shows.iter().any(|x| x.id == show.id) {
         println!("{}", Red.paint("Show already exists in database."));
-        return;
+        // TODO err
+        return Ok(());
     }
-    let episodes = match TVMaze::get_episodes(show.id) {
+    let episodes = match api::get_episodes(show.id) {
         Ok(value) => value,
         Err(err) => {
-            println!("{}", err.to_string());
-            return;
+            println!("{err}");
+            // TODO err
+            return Ok(());
         }
     };
-    let mut show = Show::from(&show);
-    show.episodes = episodes.iter().map(Episode::from).collect();
+    let mut show = Show::from(show);
+    show.episodes = episodes.into_iter().map(Episode::from).collect();
     db.add_show(show, path);
     println!("\n{}", Green.paint("Show added to library."));
     db.save();
+
+    Ok(())
 }
 
 fn read_path() -> PathBuf {
@@ -132,18 +188,26 @@ fn read_path() -> PathBuf {
 }
 
 fn init() -> Option<(Mode, Database)> {
+    init_log();
+
     let mode = Mode::from_args();
     let mut db = Database::new();
     let initialized = db.load();
     if initialized {
         return Some((mode, db));
     }
-    if !matches!(mode, Mode::Init{..}) {
-        println!("{}", Red.paint("You need to perform initialization before first use."));
+    if !matches!(mode, Mode::Init { .. }) {
+        println!(
+            "{}",
+            Red.paint("You need to perform initialization before first use.")
+        );
         println!("Use {} command.", Red.paint("init"));
         return None;
     }
-    println!("{}", Green.paint("Welcome to the revived version of TVS-Renamer."));
+    println!(
+        "{}",
+        Green.paint("Welcome to the revived version of TVS-Renamer.")
+    );
     println!("The original version was a way to learn C#, well now I'm learning Rust...");
     println!("Compared to the original there is no UI, but there is a ton of extra functionality");
     println!();
@@ -159,11 +223,35 @@ fn init() -> Option<(Mode, Database)> {
         }
         println!("Select library path: ");
     }
-    println!("{}", Green.paint("You can now use the application. Have fun!"));
-    println!("{}", Red.italic().bold().paint("Also I'm not responsible for the app ruining your things."));
+    println!(
+        "{}",
+        Green.paint("You can now use the application. Have fun!")
+    );
+    println!(
+        "{}",
+        Red.italic()
+            .bold()
+            .paint("Also I'm not responsible for the app ruining your things.")
+    );
     db.initialized = true;
     db.lib_dir = path;
     db.save();
-    return None;
+
+    None
 }
 
+fn init_log() {
+    let file = OpenOptions::new()
+        .read(true)
+        .append(true)
+        .create(true)
+        .open("log.txt")
+        .unwrap();
+
+    simplelog::WriteLogger::init(
+        log::LevelFilter::Info,
+        ConfigBuilder::new().add_filter_allow_str("tvsr").build(),
+        file,
+    )
+    .unwrap()
+}

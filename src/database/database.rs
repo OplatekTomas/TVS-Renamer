@@ -1,9 +1,8 @@
-use std::path::PathBuf;
+use crate::database::models::Show;
+use serde::{Deserialize, Serialize};
 use std::fs;
 use std::io::Write;
-use serde::{Deserialize, Serialize};
-use crate::database::models::Show;
-
+use std::path::PathBuf;
 
 #[derive(Deserialize, Serialize, Debug)]
 pub struct Database {
@@ -12,7 +11,7 @@ pub struct Database {
     pub shows: Vec<Show>,
     pub scan_dirs: Vec<PathBuf>,
     pub initialized: bool,
-    pub lib_dir: PathBuf
+    pub lib_dir: PathBuf,
 }
 
 impl Database {
@@ -22,7 +21,7 @@ impl Database {
             shows: Vec::new(),
             scan_dirs: Vec::new(),
             initialized: false,
-            lib_dir: PathBuf::new()
+            lib_dir: PathBuf::new(),
         }
     }
     pub(crate) fn load(&mut self) -> bool {
@@ -40,24 +39,23 @@ impl Database {
         self.scan_dirs = db.scan_dirs;
         self.initialized = db.initialized;
         self.lib_dir = db.lib_dir;
-        return self.initialized;
+
+        self.initialized
     }
     pub(crate) fn save(&self) {
         let json = serde_json::to_string_pretty(&self).expect("Failed to serialize database");
-        let mut file = fs::File::create(self.db_path.clone()).expect("Failed to create database file");
-        file.write_all(json.as_bytes()).expect("Failed to write database file");
+        let mut file =
+            fs::File::create(self.db_path.clone()).expect("Failed to create database file");
+        file.write_all(json.as_bytes())
+            .expect("Failed to write database file");
     }
 
     pub(crate) fn get_show(&self, id: i64) -> Option<&Show> {
-        return self.shows.iter().find(|x| x.id == id)
-    }
-
-    pub(crate) fn has_show(&self, id: i64) -> bool {
-        return self.shows.iter().any(|s| s.id == id);
+        self.shows.iter().find(|x| x.id == id)
     }
 
     pub fn add_show(&mut self, mut show: Show, path: Option<PathBuf>) {
-        show.path = match path{
+        show.path = match path {
             Some(value) => value,
             None => {
                 let mut dir = self.lib_dir.clone();

@@ -1,9 +1,8 @@
+use ansi_term::Colour::Red;
 use std::io;
 use std::io::Write;
-use ansi_term::Colour::Red;
 
-
-fn print_before_read(text: &Option<String>){
+fn print_before_read(text: &Option<String>) {
     match text {
         Some(text) => {
             print!("{}", text);
@@ -28,4 +27,3 @@ pub fn read_number(text: Option<String>) -> i32 {
         }
     }
 }
-

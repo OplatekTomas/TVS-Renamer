@@ -1,50 +1,32 @@
-use std::fmt::{Display, Formatter};
 use std::path::PathBuf;
-use std::str::FromStr;
 use structopt::StructOpt;
 
 /// Program to make sense of library of TV shows...
-#[derive(StructOpt, Debug, PartialEq)]
+#[derive(StructOpt, Debug, PartialEq, Eq)]
 #[structopt()]
 pub enum Mode {
-    Init{
-    },
-    RenameShow{
+    Init {},
+    RenameShow {
         #[structopt(short, long)]
-        id: i32
+        id: i32,
     },
     RenameAllShows,
-    AddScanDirectory{
+    AddScanDirectory {
         #[structopt(short, long)]
-        path: PathBuf
+        path: PathBuf,
     },
-    AddShow{
+    AddShow {
         #[structopt(short, long)]
         name: String,
         #[structopt(short, long)]
         path: Option<PathBuf>,
-        #[structopt(short, long,parse(try_from_str) ,default_value = "false")]
-        risky: bool
+        #[structopt(short, long, parse(try_from_str), default_value = "false")]
+        risky: bool,
     },
-    RemoveShow{
+    RemoveShow {
         #[structopt(short, long)]
-        id: i32
+        id: i32,
     },
     ListShows,
     ListScanDirectories,
 }
-
-
-#[derive(Debug)]
-pub enum ParseError {
-    InvalidMode,
-}
-
-impl Display for ParseError {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        match self {
-            ParseError::InvalidMode => write!(f, "Invalid mode"),
-        }
-    }
-}
-
