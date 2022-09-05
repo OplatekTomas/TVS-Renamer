@@ -11,12 +11,10 @@ use std::path::{Path, PathBuf};
 use structopt::StructOpt;
 
 use crate::api::show::ShowResult;
-use crate::api::tv_maze;
 use crate::args::args_parser::Mode;
 use crate::database::database::Database;
 use crate::database::models::{Episode, Show};
 use crate::renamer::Renamer;
-use crate::tv_maze::TVMaze;
 
 mod api;
 mod args;
@@ -30,7 +28,9 @@ fn main() {
         None => return,
     };
     match mode {
-        Mode::AddShow { name, path, risky } => add_show(&mut db, &name, path, risky),
+        Mode::AddShow { name, path, risky } => {
+            add_show(&mut db, &name, path, risky);
+        }
         Mode::ListShows => list_shows(&mut db),
         Mode::AddScanDirectory { path } => add_scan_directory(&mut db, path),
         Mode::ListScanDirectories => list_scan_directories(&mut db),
@@ -108,23 +108,60 @@ fn list_shows(db: &mut Database) {
     }
 }
 
-fn add_show(db: &mut Database, name: &String, path: Option<PathBuf>, risky: bool) {
-    let show = match TVMaze::search(name, risky) {
-        Ok(value) => value,
-        Err(err) => {
-            println!("{err}");
-            return;
+fn add_show(
+    db: &mut Database,
+    name: &String,
+    path: Option<PathBuf>,
+    risky: bool,
+) -> Result<(), ureq::Error> {
+    let show = match risky {
+        true => api::find_show_by_name_risky(name)?,
+        false => {
+            let mut shows = api::find_shows_by_name(name)?;
+
+            println!(
+                "{}",
+                Green.bold().paint("The API found the following shows:")
+            );
+            for (index, show) in shows.iter().enumerate() {
+                let bold = format!(
+                    "[{}]: {}",
+                    Style::new().bold().paint(index.to_string()),
+                    Style::new().bold().paint(&show.name)
+                );
+                match show.premiered {
+                    Some(ref premiered_date) => {
+                        println!("{} ({}), {}", bold, premiered_date, show.url)
+                    }
+                    None => println!("{}, {}", bold, show.url),
+                }
+            }
+            let text = format!("Please select a show (0-{}): ", shows.len() - 1);
+            let mut index: usize;
+            loop {
+                index =
+                    helper::read_number(Some(format!("{}", Green.bold().paint(&text)))) as usize;
+                if index < shows.len() {
+                    break;
+                }
+                println!("{}", Red.paint("value not in range"));
+            }
+
+            shows.remove(index)
         }
     };
+
     if db.shows.iter().any(|x| x.id == show.id) {
         println!("{}", Red.paint("Show already exists in database."));
-        return;
+        // TODO err
+        return Ok(());
     }
-    let episodes = match TVMaze::get_episodes(show.id) {
+    let episodes = match api::get_episodes(show.id) {
         Ok(value) => value,
         Err(err) => {
             println!("{err}");
-            return;
+            // TODO err
+            return Ok(());
         }
     };
     let mut show = Show::from(show);
@@ -132,6 +169,8 @@ fn add_show(db: &mut Database, name: &String, path: Option<PathBuf>, risky: bool
     db.add_show(show, path);
     println!("\n{}", Green.paint("Show added to library."));
     db.save();
+
+    Ok(())
 }
 
 fn read_path() -> PathBuf {
